@@ -512,6 +512,17 @@
 <a href="#512" id="512">512</a>
 <a href="#513" id="513">513</a>
 <a href="#514" id="514">514</a>
+<a href="#515" id="515">515</a>
+<a href="#516" id="516">516</a>
+<a href="#517" id="517">517</a>
+<a href="#518" id="518">518</a>
+<a href="#519" id="519">519</a>
+<a href="#520" id="520">520</a>
+<a href="#521" id="521">521</a>
+<a href="#522" id="522">522</a>
+<a href="#523" id="523">523</a>
+<a href="#524" id="524">524</a>
+<a href="#525" id="525">525</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ## Mithril Stake Distribution Service
 //!
 //! This module contains the service to interact with a given Mithril Aggregator
@@ -550,9 +561,7 @@
 
 <span class="kw">use </span>mithril_common::{
     certificate_chain::CertificateVerifier,
-    crypto_helper::{
-        ProtocolAggregateVerificationKey, ProtocolGenesisVerificationKey, ProtocolGenesisVerifier,
-    },
+    crypto_helper::{ProtocolAggregateVerificationKey, ProtocolGenesisVerificationKey},
     entities::{MithrilStakeDistribution, ProtocolMessagePartKey},
     messages::MithrilStakeDistributionListItemMessage,
     protocol::SignerBuilder,
@@ -699,11 +708,7 @@
                 })
                 .map_err(MithrilStakeDistributionServiceError::InvalidParameters)<span class="question-mark">?</span>;
         <span class="self">self</span>.certificate_verifier
-            .verify_certificate_chain(
-                certificate.clone(),
-                <span class="self">self</span>.certificate_client.clone(),
-                <span class="kw-2">&amp;</span>ProtocolGenesisVerifier::from_verification_key(genesis_verification_key),
-            )
+            .verify_certificate_chain(certificate.clone(), <span class="kw-2">&amp;</span>genesis_verification_key)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let </span>avk = <span class="self">self
@@ -803,10 +808,10 @@
     }
 
     <span class="doccomment">/// Instantiate a Genesis Signer and its associated Verifier
-    </span><span class="kw">pub fn </span>setup_genesis() -&gt; (ProtocolGenesisSigner, ProtocolGenesisVerifier) {
+    </span><span class="kw">pub fn </span>setup_genesis() -&gt; (ProtocolGenesisSigner, ProtocolGenesisVerificationKey) {
         <span class="kw">let </span>genesis_signer = ProtocolGenesisSigner::create_deterministic_genesis_signer();
         <span class="kw">let </span>genesis_verifier = genesis_signer.create_genesis_verifier();
-        (genesis_signer, genesis_verifier)
+        (genesis_signer, genesis_verifier.to_verification_key())
     }
 
     <span class="attr">#[tokio::test]
@@ -816,10 +821,14 @@
             <span class="prelude-val">Ok</span>(serde_json::to_string(<span class="kw-2">&amp;</span>get_stake_distribution_list_message()).unwrap())
         });
         <span class="kw">let </span>http_client = Arc::new(http_client);
+        <span class="kw">let </span>certificate_client = Arc::new(CertificateClient::new(http_client.clone()));
         <span class="kw">let </span>service = AppMithrilStakeDistributionService::new(
             Arc::new(MithrilStakeDistributionClient::new(http_client.clone())),
-            Arc::new(CertificateClient::new(http_client.clone())),
-            Arc::new(MithrilCertificateVerifier::new(slog_scope::logger())),
+            certificate_client.clone(),
+            Arc::new(MithrilCertificateVerifier::new(
+                slog_scope::logger(),
+                certificate_client,
+            )),
         );
         <span class="kw">let </span>list = service.list().<span class="kw">await</span>.unwrap();
 
@@ -852,7 +861,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>certificate_verifier = MockCertificateVerifierImpl::new();
         certificate_verifier
             .expect_verify_certificate_chain()
-            .returning(|<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .returning(|<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
             .times(<span class="number">1</span>);
         certificate_verifier
             .expect_verify_protocol_message()
@@ -865,8 +874,7 @@
         );
 
         <span class="kw">let </span>dirpath = std::env::temp_dir().join(<span class="string">&quot;test_download_ok&quot;</span>);
-        <span class="kw">let </span>(<span class="kw">_</span>, genesis_verifier) = setup_genesis();
-        <span class="kw">let </span>genesis_verification_key = genesis_verifier.to_verification_key();
+        <span class="kw">let </span>(<span class="kw">_</span>, genesis_verification_key) = setup_genesis();
         <span class="kw">let </span>filepath = service
             .download(
                 <span class="string">&quot;hash-123&quot;</span>,
@@ -905,7 +913,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>certificate_verifier = MockCertificateVerifierImpl::new();
         certificate_verifier
             .expect_verify_certificate_chain()
-            .returning(|<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .returning(|<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
             .times(<span class="number">1</span>);
         certificate_verifier
             .expect_verify_protocol_message()
@@ -918,8 +926,7 @@
         );
 
         <span class="kw">let </span>dirpath = std::env::temp_dir().join(<span class="string">&quot;test_download_ko&quot;</span>);
-        <span class="kw">let </span>(<span class="kw">_</span>, genesis_verifier) = setup_genesis();
-        <span class="kw">let </span>genesis_verification_key = genesis_verifier.to_verification_key();
+        <span class="kw">let </span>(<span class="kw">_</span>, genesis_verification_key) = setup_genesis();
         <span class="kw">let </span>_error = service
             .download(
                 <span class="string">&quot;hash-123&quot;</span>,
@@ -932,12 +939,15 @@
 
     <span class="attr">#[tokio::test]
     </span><span class="kw">async fn </span>expand_eventual_artifact_hash_alias_should_returns_hash() {
-        <span class="kw">let </span>http_client = MockAggregatorHTTPClient::new();
-        <span class="kw">let </span>http_client = Arc::new(http_client);
+        <span class="kw">let </span>http_client = Arc::new(MockAggregatorHTTPClient::new());
+        <span class="kw">let </span>certificate_client = Arc::new(CertificateClient::new(http_client.clone()));
         <span class="kw">let </span>service = AppMithrilStakeDistributionService::new(
             Arc::new(MithrilStakeDistributionClient::new(http_client.clone())),
-            Arc::new(CertificateClient::new(http_client.clone())),
-            Arc::new(MithrilCertificateVerifier::new(slog_scope::logger())),
+            certificate_client.clone(),
+            Arc::new(MithrilCertificateVerifier::new(
+                slog_scope::logger(),
+                certificate_client,
+            )),
         );
 
         <span class="kw">let </span>hash = service
@@ -955,10 +965,14 @@
             <span class="prelude-val">Ok</span>(serde_json::to_string(<span class="kw-2">&amp;</span>get_stake_distribution_list_message()).unwrap())
         });
         <span class="kw">let </span>http_client = Arc::new(http_client);
+        <span class="kw">let </span>certificate_client = Arc::new(CertificateClient::new(http_client.clone()));
         <span class="kw">let </span>service = AppMithrilStakeDistributionService::new(
             Arc::new(MithrilStakeDistributionClient::new(http_client.clone())),
-            Arc::new(CertificateClient::new(http_client.clone())),
-            Arc::new(MithrilCertificateVerifier::new(slog_scope::logger())),
+            certificate_client.clone(),
+            Arc::new(MithrilCertificateVerifier::new(
+                slog_scope::logger(),
+                certificate_client,
+            )),
         );
 
         <span class="kw">let </span>hash = service
@@ -976,10 +990,14 @@
             <span class="prelude-val">Ok</span>(serde_json::to_string(<span class="kw-2">&amp;</span>get_stake_distribution_list_message()).unwrap())
         });
         <span class="kw">let </span>http_client = Arc::new(http_client);
+        <span class="kw">let </span>certificate_client = Arc::new(CertificateClient::new(http_client.clone()));
         <span class="kw">let </span>service = AppMithrilStakeDistributionService::new(
             Arc::new(MithrilStakeDistributionClient::new(http_client.clone())),
-            Arc::new(CertificateClient::new(http_client.clone())),
-            Arc::new(MithrilCertificateVerifier::new(slog_scope::logger())),
+            certificate_client.clone(),
+            Arc::new(MithrilCertificateVerifier::new(
+                slog_scope::logger(),
+                certificate_client,
+            )),
         );
 
         <span class="kw">let </span>hash = service
@@ -997,10 +1015,14 @@
             .expect_get_content()
             .returning(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="string">&quot;[]&quot;</span>.to_string()));
         <span class="kw">let </span>http_client = Arc::new(http_client);
+        <span class="kw">let </span>certificate_client = Arc::new(CertificateClient::new(http_client.clone()));
         <span class="kw">let </span>service = AppMithrilStakeDistributionService::new(
             Arc::new(MithrilStakeDistributionClient::new(http_client.clone())),
-            Arc::new(CertificateClient::new(http_client.clone())),
-            Arc::new(MithrilCertificateVerifier::new(slog_scope::logger())),
+            certificate_client.clone(),
+            Arc::new(MithrilCertificateVerifier::new(
+                slog_scope::logger(),
+                certificate_client,
+            )),
         );
 
         <span class="kw">let </span>err = service

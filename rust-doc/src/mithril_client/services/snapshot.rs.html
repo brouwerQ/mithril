@@ -845,10 +845,6 @@
 <a href="#845" id="845">845</a>
 <a href="#846" id="846">846</a>
 <a href="#847" id="847">847</a>
-<a href="#848" id="848">848</a>
-<a href="#849" id="849">849</a>
-<a href="#850" id="850">850</a>
-<a href="#851" id="851">851</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ## Snapshot Service
 //!
 //! This module contains the service to interact with a given Mithril Aggregator
@@ -1012,11 +1008,7 @@
             ProtocolGenesisVerifier::from_verification_key(genesis_verification_key);
 
         <span class="self">self</span>.certificate_verifier
-            .verify_certificate_chain(
-                certificate.clone(),
-                <span class="self">self</span>.certificate_client.clone(),
-                <span class="kw-2">&amp;</span>genesis_verifier,
-            )
+            .verify_certificate_chain(certificate.clone(), <span class="kw-2">&amp;</span>genesis_verifier.to_verification_key())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
@@ -1309,7 +1301,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>certificate_verifier = MockCertificateVerifierImpl::new();
         certificate_verifier
             .expect_verify_certificate_chain()
-            .returning(|<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
+            .returning(|<span class="kw">_</span>, <span class="kw">_</span>| <span class="prelude-val">Ok</span>(()))
             .times(<span class="number">1</span>);
 
         <span class="kw">let </span>dumb_digester = DumbImmutableDigester::new(<span class="string">&quot;snapshot-digest-123&quot;</span>, <span class="bool-val">true</span>);
