@@ -3277,6 +3277,7 @@ name = "mithril-relay"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "clap",
  "libp2p",
  "mithril-common",
  "reqwest",
