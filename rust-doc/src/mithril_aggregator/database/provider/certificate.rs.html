@@ -1420,7 +1420,7 @@
     entities::{
         Beacon, Certificate, CertificateMetadata, CertificateSignature, Epoch,
         HexEncodedAgregateVerificationKey, HexEncodedKey, ProtocolMessage, ProtocolParameters,
-        ProtocolVersion, SignerWithStake,
+        ProtocolVersion, StakeDistributionParty,
     },
     sqlite::{
         EntityCursor, HydrationError, Projection, Provider, SourceAlias, SqLiteEntity,
@@ -1467,8 +1467,8 @@
     <span class="doccomment">/// Structured message that is used to create the signed message
     </span><span class="kw">pub </span>protocol_message: ProtocolMessage,
 
-    <span class="doccomment">/// The list of the active signers with their stakes and verification keys
-    </span><span class="kw">pub </span>signers: Vec&lt;SignerWithStake&gt;,
+    <span class="doccomment">/// The list of the active signers with their stakes
+    </span><span class="kw">pub </span>signers: Vec&lt;StakeDistributionParty&gt;,
 
     <span class="doccomment">/// Date and time when the certificate was initiated
     </span><span class="kw">pub </span>initiated_at: DateTime&lt;Utc&gt;,
@@ -1625,7 +1625,7 @@
             signers: serde_json::from_str(signers_string).map_err(
                 |e| {
                     HydrationError::InvalidData(<span class="macro">format!</span>(
-                        <span class="string">&quot;Could not turn string &#39;{signers_string}&#39; to Vec&lt;SignerWithStake&gt;. Error: {e}&quot;
+                        <span class="string">&quot;Could not turn string &#39;{signers_string}&#39; to Vec&lt;StakeDistributionParty&gt;. Error: {e}&quot;
                     </span>))
                 },
             )<span class="question-mark">?</span>,
