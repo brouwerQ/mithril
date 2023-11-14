@@ -609,8 +609,6 @@
 <a href="#609" id="609">609</a>
 <a href="#610" id="610">610</a>
 <a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::database::provider::{CertificateRepository, SignedEntityStorer};
 <span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>mithril_common::{entities::Certificate, StdResult};
@@ -661,6 +659,7 @@
             <span class="comment">// arbitrary high value to get all existing certificates
             </span>.get_latest_certificates(usize::MAX)
             .<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>certificates_to_remove = <span class="macro">vec!</span>[];
 
         <span class="kw">let </span><span class="kw-2">mut </span>migrated_certificates = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>old_and_new_hashes: HashMap&lt;String, String&gt; = HashMap::new();
@@ -670,7 +669,7 @@
         // in order to have a strong guarantee that when inserting a certificate in the db its
         // previous_hash exist we have to work in the reverse order.
         </span><span class="macro">debug!</span>(<span class="string">&quot;🔧 Certificate Hash Migrator: computing new hash for all certificates&quot;</span>);
-        <span class="kw">for </span><span class="kw-2">mut </span>certificate <span class="kw">in </span>old_certificates.clone().into_iter().rev() {
+        <span class="kw">for </span><span class="kw-2">mut </span>certificate <span class="kw">in </span>old_certificates.into_iter().rev() {
             <span class="kw">let </span>old_previous_hash = <span class="kw">if </span>certificate.is_genesis() {
                 certificate.previous_hash.clone()
             } <span class="kw">else </span>{
@@ -685,40 +684,37 @@
                 old_previous_hash
             };
 
-            <span class="kw">let </span>new_hash = {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(new_hash) = {
                 <span class="kw">let </span>computed_hash = certificate.compute_hash();
-                <span class="comment">// return none if the hash did not change to trigger an error
+                <span class="comment">// return none if the hash did not change
                 </span>(computed_hash != certificate.hash).then_some(computed_hash)
-            }
-            .ok_or(<span class="macro">anyhow!</span>(
-                <span class="string">&quot;Hash did not change for certificate {:?}, hash: {}&quot;</span>,
-                certificate.beacon,
-                certificate.hash
-            ))<span class="question-mark">?
-            </span>.to_owned();
+            } {
+                old_and_new_hashes.insert(certificate.hash.clone(), new_hash.clone());
 
-            old_and_new_hashes.insert(certificate.hash.clone(), new_hash.clone());
+                <span class="kw">if </span>certificate.is_genesis() {
+                    <span class="macro">trace!</span>(
+                        <span class="string">&quot;🔧 Certificate Hash Migrator: new hash computed for genesis certificate {:?}&quot;</span>,
+                        certificate.beacon;
+                        <span class="string">&quot;old_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.hash,
+                        <span class="string">&quot;new_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>new_hash,
+                    );
+                } <span class="kw">else </span>{
+                    <span class="macro">trace!</span>(
+                        <span class="string">&quot;🔧 Certificate Hash Migrator: new hash computed for certificate {:?}&quot;</span>,
+                        certificate.beacon;
+                        <span class="string">&quot;old_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.hash,
+                        <span class="string">&quot;new_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>new_hash,
+                        <span class="string">&quot;old_previous_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>old_previous_hash,
+                        <span class="string">&quot;new_previous_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.previous_hash
+                    );
+                }
 
-            <span class="kw">if </span>certificate.is_genesis() {
-                <span class="macro">trace!</span>(
-                    <span class="string">&quot;🔧 Certificate Hash Migrator: new hash computed for genesis certificate {:?}&quot;</span>,
-                    certificate.beacon;
-                    <span class="string">&quot;old_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.hash,
-                    <span class="string">&quot;new_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>new_hash,
-                );
+                certificates_to_remove.push(certificate.clone());
+                certificate.hash = new_hash;
+                migrated_certificates.push(certificate);
             } <span class="kw">else </span>{
-                <span class="macro">trace!</span>(
-                    <span class="string">&quot;🔧 Certificate Hash Migrator: new hash computed for certificate {:?}&quot;</span>,
-                    certificate.beacon;
-                    <span class="string">&quot;old_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.hash,
-                    <span class="string">&quot;new_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>new_hash,
-                    <span class="string">&quot;old_previous_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>old_previous_hash,
-                    <span class="string">&quot;new_previous_hash&quot; </span>=&gt; <span class="kw-2">&amp;</span>certificate.previous_hash
-                );
+                old_and_new_hashes.insert(certificate.hash.clone(), certificate.hash);
             }
-
-            certificate.hash = new_hash;
-            migrated_certificates.push(certificate);
         }
 
         <span class="comment">// 2 - Certificates migrated, we can insert them in the db
@@ -736,7 +732,7 @@
             </span>})<span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>((old_certificates, old_and_new_hashes))
+        <span class="prelude-val">Ok</span>((certificates_to_remove, old_and_new_hashes))
     }
 
     <span class="kw">async fn </span>update_signed_entities_certificate_hash(
@@ -1203,7 +1199,7 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>should_fail_if_any_hash_doesnt_change() {
+    </span><span class="kw">async fn </span>should_not_fail_if_some_hash_dont_change() {
         <span class="kw">let </span>connection = Arc::new(connection_without_foreign_key_support());
         <span class="kw">let </span>certificate = {
             <span class="kw">let </span><span class="kw-2">mut </span>cert = dummy_genesis(<span class="string">&quot;whatever&quot;</span>, <span class="number">1</span>, <span class="number">2</span>);
@@ -1221,7 +1217,7 @@
         migrator
             .migrate()
             .<span class="kw">await
-            </span>.expect_err(<span class="string">&quot;Migration should fail if an hash doesnt change&quot;</span>);
+            </span>.expect(<span class="string">&quot;Migration should not fail if a hash doesn&#39;t change&quot;</span>);
     }
 }
 </code></pre></div></section></main></body></html>
