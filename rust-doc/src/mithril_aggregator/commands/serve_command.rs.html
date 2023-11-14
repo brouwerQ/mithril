@@ -347,7 +347,7 @@
         }
 
         join_set.spawn(<span class="kw">async </span>{ tokio::signal::ctrl_c().<span class="kw">await</span>.map_err(|e| e.to_string()) });
-        dependencies_builder.vanish();
+        dependencies_builder.vanish().<span class="kw">await</span>;
 
         <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = join_set.join_next().<span class="kw">await</span>.unwrap()<span class="question-mark">? </span>{
             <span class="macro">crit!</span>(<span class="string">&quot;A critical error occurred: {e}&quot;</span>);
