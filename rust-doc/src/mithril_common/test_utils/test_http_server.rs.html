@@ -168,6 +168,8 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Define a HttpServer for test that can be configured using warp filters.
 
 </span><span class="comment">// Base code from the httpserver in reqwest tests:
@@ -216,12 +218,14 @@
     </span>F: Filter + Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
     F::Extract: Reply,
 {
-    <span class="kw">let </span>port = <span class="number">0_u16</span>;
-    test_http_server_with_port(filters, port)
+    test_http_server_with_socket_address(filters, ([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>], <span class="number">0</span>).into())
 }
 
 <span class="doccomment">/// Spawn a [TestHttpServer] using the given warp filters
-</span><span class="kw">pub fn </span>test_http_server_with_port&lt;F&gt;(filters: F, port: u16) -&gt; TestHttpServer
+</span><span class="kw">pub fn </span>test_http_server_with_socket_address&lt;F&gt;(
+    filters: F,
+    socket_addr: SocketAddr,
+) -&gt; TestHttpServer
 <span class="kw">where
     </span>F: Filter + Clone + Send + Sync + <span class="lifetime">&#39;static</span>,
     F::Extract: Reply,
@@ -234,7 +238,7 @@
             .expect(<span class="string">&quot;new rt&quot;</span>);
         <span class="kw">let </span>(shutdown_tx, shutdown_rx) = oneshot::channel();
         <span class="kw">let </span>(address, server) = rt.block_on(<span class="kw">async move </span>{
-            warp::serve(filters).bind_with_graceful_shutdown(([<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>], port), <span class="kw">async </span>{
+            warp::serve(filters).bind_with_graceful_shutdown(socket_addr, <span class="kw">async </span>{
                 shutdown_rx.<span class="kw">await</span>.ok();
             })
         });
