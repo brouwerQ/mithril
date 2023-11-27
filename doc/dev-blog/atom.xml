@@ -2,11 +2,26 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://mithril.network/doc/dev-blog</id>
     <title>Mithril. A complete guide. Blog</title>
-    <updated>2023-10-10T00:00:00.000Z</updated>
+    <updated>2023-11-27T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://mithril.network/doc/dev-blog"/>
     <subtitle>Mithril. A complete guide. Blog</subtitle>
     <icon>https://mithril.network/doc/img/logo.svg</icon>
+    <entry>
+        <title type="html"><![CDATA[Mithril client library is released!]]></title>
+        <id>https://mithril.network/doc/dev-blog/2023/11/27/mithril-client-library-released</id>
+        <link href="https://mithril.network/doc/dev-blog/2023/11/27/mithril-client-library-released"/>
+        <updated>2023-11-27T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[Mithril client library is open to developers on crates.io]]></summary>
+        <content type="html"><![CDATA[<h3 class="anchor anchorWithStickyNavbar_LWe7" id="mithril-client-library-is-open-to-developers-on-cratesio">Mithril client library is open to developers on crates.io<a href="#mithril-client-library-is-open-to-developers-on-cratesio" class="hash-link" aria-label="Direct link to Mithril client library is open to developers on crates.io" title="Direct link to Mithril client library is open to developers on crates.io">​</a></h3><p>The Mithril team has published the first release (<strong>v0.5.7)</strong> of its <a href="https://crates.io/crates/mithril-client" target="_blank" rel="noopener noreferrer">mithril-client</a> library on crates.io.</p><p>The <strong>Mithril client library</strong> allows developers to use all the tooling necessary to manipulate Mithril certified types from a Mithril Aggregator directly in their (Rust) applications and to develop their own Mithril clients!</p><p>Here are some useful documentation that can be used by developers:</p><ul><li><strong>Developer documentation</strong>: <a href="https://docs.rs/mithril-client/0.5.7/mithril_client/" target="_blank" rel="noopener noreferrer">https://docs.rs/mithril-client/0.5.7/mithril_client/</a></li><li><strong>Example of implementations</strong>:<a href="https://github.com/input-output-hk/mithril/blob/main/mithril-client/examples/" target="_blank" rel="noopener noreferrer">https://github.com/input-output-hk/mithril/blob/main/mithril-client/examples/</a></li><li><strong>Mithril client repository</strong>: <a href="https://github.com/input-output-hk/mithril/tree/main/mithril-client" target="_blank" rel="noopener noreferrer">https://github.com/input-output-hk/mithril/tree/main/mithril-client</a></li><li><strong>Crates.io</strong>: <a href="https://crates.io/crates/mithril-client" target="_blank" rel="noopener noreferrer">https://crates.io/crates/mithril-client</a></li></ul><p>Feel free to reach out to us on the <a href="https://discord.gg/5kaErDKDRq" target="_blank" rel="noopener noreferrer">Discord channel</a> for questions and/or help.</p>]]></content>
+        <author>
+            <name>Mithril Team</name>
+        </author>
+        <category label="spo" term="spo"/>
+        <category label="mithril client" term="mithril client"/>
+        <category label="library" term="library"/>
+        <category label="crates.io" term="crates.io"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mithril Relay Security Advisory]]></title>
         <id>https://mithril.network/doc/dev-blog/2023/10/10/relay-security-advisory</id>
