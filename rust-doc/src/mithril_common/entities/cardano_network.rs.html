@@ -124,12 +124,23 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt::Display;
 <span class="kw">use </span>thiserror::Error;
 
 <span class="kw">use </span><span class="kw">crate</span>::MagicId;
 
+<span class="kw">const </span>MAINNET_MAGIC_ID: MagicId = <span class="number">764824073</span>;
 <span class="kw">const </span>TESTNET_MAGIC_ID: MagicId = <span class="number">1097911063</span>;
 <span class="kw">const </span>PREPROD_MAGIC_ID: MagicId = <span class="number">1</span>;
 <span class="kw">const </span>PREVIEW_MAGIC_ID: MagicId = <span class="number">2</span>;
@@ -186,6 +197,15 @@
             what =&gt; <span class="prelude-val">Err</span>(CardanoNetworkError::ParseFromCode(<span class="macro">format!</span>(
                 <span class="string">&quot;could not parse network &#39;{what}&#39;, the only recognized networks are: mainnet, devnet, testnet, preview, preprod and private&quot;
             </span>))),
+        }
+    }
+
+    <span class="doccomment">/// Returns the code (magic) of the network
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MagicId {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            CardanoNetwork::MainNet =&gt; MAINNET_MAGIC_ID,
+            CardanoNetwork::DevNet(magic_id) =&gt; magic_id,
+            CardanoNetwork::TestNet(magic_id) =&gt; magic_id,
         }
     }
 }

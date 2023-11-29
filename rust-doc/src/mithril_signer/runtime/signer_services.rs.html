@@ -365,6 +365,15 @@
 <a href="#365" id="365">365</a>
 <a href="#366" id="366">366</a>
 <a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
+<a href="#371" id="371">371</a>
+<a href="#372" id="372">372</a>
+<a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>sqlite::{Connection, ConnectionWithFullMutex};
@@ -372,7 +381,9 @@
 
 <span class="kw">use </span>mithril_common::{
     api_version::APIVersionProvider,
-    chain_observer::{CardanoCliChainObserver, CardanoCliRunner, ChainObserver},
+    chain_observer::{
+        CardanoCliChainObserver, CardanoCliRunner, ChainObserver, PallasChainObserver,
+    },
     crypto_helper::{OpCert, ProtocolPartyId, SerDeShelleyFileFormat},
     database::{ApplicationNodeType, DatabaseVersionChecker},
     digesters::{
@@ -423,14 +434,21 @@
     </span><span class="kw">pub fn </span>new(config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Configuration) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>chain_observer_builder: <span class="kw">fn</span>(<span class="kw-2">&amp;</span>Configuration) -&gt; StdResult&lt;ChainObserverService&gt; =
             |config: <span class="kw-2">&amp;</span>Configuration| {
-                <span class="prelude-val">Ok</span>(Arc::new(CardanoCliChainObserver::new(Box::new(
-                    CardanoCliRunner::new(
-                        config.cardano_cli_path.clone(),
-                        config.cardano_node_socket_path.clone(),
-                        config.get_network()<span class="question-mark">?</span>,
-                    ),
-                ))))
+                <span class="kw">let </span>fallback = CardanoCliChainObserver::new(Box::new(CardanoCliRunner::new(
+                    config.cardano_cli_path.clone(),
+                    config.cardano_node_socket_path.clone(),
+                    config.get_network()<span class="question-mark">?</span>,
+                )));
+
+                <span class="kw">let </span>observer = PallasChainObserver::new(
+                    <span class="kw-2">&amp;</span>config.cardano_node_socket_path,
+                    config.get_network()<span class="question-mark">?</span>,
+                    fallback,
+                );
+
+                <span class="prelude-val">Ok</span>(Arc::new(observer))
             };
+
         <span class="kw">let </span>immutable_file_observer_builder: <span class="kw">fn</span>(
             <span class="kw-2">&amp;</span>Configuration,
         )
