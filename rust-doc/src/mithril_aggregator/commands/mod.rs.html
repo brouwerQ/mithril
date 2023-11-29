@@ -108,6 +108,7 @@
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>era_command;
 <span class="kw">mod </span>genesis_command;
 <span class="kw">mod </span>serve_command;
@@ -211,9 +212,10 @@
     <span class="doccomment">/// get log level from parameters
     </span><span class="kw">pub fn </span>log_level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Level {
         <span class="kw">match </span><span class="self">self</span>.verbose {
-            <span class="number">0 </span>=&gt; Level::Warning,
-            <span class="number">1 </span>=&gt; Level::Info,
-            <span class="number">2 </span>=&gt; Level::Debug,
+            <span class="number">0 </span>=&gt; Level::Error,
+            <span class="number">1 </span>=&gt; Level::Warning,
+            <span class="number">2 </span>=&gt; Level::Info,
+            <span class="number">3 </span>=&gt; Level::Debug,
             <span class="kw">_ </span>=&gt; Level::Trace,
         }
     }

@@ -126,6 +126,7 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 
 </span><span class="kw">mod </span>commands;
@@ -188,9 +189,10 @@
 
     <span class="kw">fn </span>log_level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Level {
         <span class="kw">match </span><span class="self">self</span>.verbose {
-            <span class="number">0 </span>=&gt; Level::Warning,
-            <span class="number">1 </span>=&gt; Level::Info,
-            <span class="number">2 </span>=&gt; Level::Debug,
+            <span class="number">0 </span>=&gt; Level::Error,
+            <span class="number">1 </span>=&gt; Level::Warning,
+            <span class="number">2 </span>=&gt; Level::Info,
+            <span class="number">3 </span>=&gt; Level::Debug,
             <span class="kw">_ </span>=&gt; Level::Trace,
         }
     }
