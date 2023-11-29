@@ -374,10 +374,12 @@
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>sqlite::{Connection, ConnectionWithFullMutex};
-<span class="kw">use </span>std::{fs, sync::Arc};
+<span class="kw">use </span>std::{fs, sync::Arc, time::Duration};
 
 <span class="kw">use </span>mithril_common::{
     api_version::APIVersionProvider,
@@ -403,6 +405,7 @@
 <span class="kw">use crate</span>::{
     aggregator_client::AggregatorClient, single_signer::SingleSigner, AggregatorHTTPClient,
     Configuration, MithrilSingleSigner, ProtocolInitializerStore, ProtocolInitializerStorer,
+    HTTP_REQUEST_TIMEOUT_DURATION,
 };
 
 <span class="kw">type </span>StakeStoreService = Arc&lt;StakeStore&gt;;
@@ -605,6 +608,7 @@
             <span class="self">self</span>.config.aggregator_endpoint.clone(),
             <span class="self">self</span>.config.relay_endpoint.clone(),
             api_version_provider.clone(),
+            <span class="prelude-val">Some</span>(Duration::from_millis(HTTP_REQUEST_TIMEOUT_DURATION)),
         ));
 
         <span class="kw">let </span>cardano_immutable_snapshot_builder =
