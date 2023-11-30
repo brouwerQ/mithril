@@ -106,7 +106,7 @@
     database::provider::SignerGetter,
     dependency_injection::EpochServiceWrapper,
     event_store::{EventMessage, TransmitterService},
-    services::{CertifierService, HttpMessageService, SignedEntityService, TickerService},
+    services::{CertifierService, MessageService, SignedEntityService, TickerService},
     CertificatePendingStore, Configuration, DependencyContainer, SignerRegisterer,
     VerificationKeyStorer,
 };
@@ -203,7 +203,7 @@
 <span class="doccomment">/// With Message service
 </span><span class="kw">pub fn </span>with_http_message_service(
     dependency_manager: Arc&lt;DependencyContainer&gt;,
-) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,), Error = Infallible&gt; + Clone {
-    warp::any().map(<span class="kw">move </span>|| dependency_manager.http_message_service.clone())
+) -&gt; <span class="kw">impl </span>Filter&lt;Extract = (Arc&lt;<span class="kw">dyn </span>MessageService&gt;,), Error = Infallible&gt; + Clone {
+    warp::any().map(<span class="kw">move </span>|| dependency_manager.message_service.clone())
 }
 </code></pre></div></section></main></body></html>

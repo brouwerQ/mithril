@@ -393,7 +393,7 @@
 
 <span class="kw">mod </span>handlers {
     <span class="kw">use crate</span>::{
-        http_server::routes::reply, services::HttpMessageService, CertificatePendingStore,
+        http_server::routes::reply, services::MessageService, CertificatePendingStore,
         ToCertificatePendingMessageAdapter,
     };
 
@@ -426,12 +426,12 @@
 
     <span class="doccomment">/// List all Certificates
     </span><span class="kw">pub async fn </span>certificate_certificates(
-        http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>MessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(<span class="string">&quot;⇄ HTTP SERVER: certificate_certificates&quot;</span>,);
 
         <span class="kw">match </span>http_message_service
-            .get_last_certificates(LIST_MAX_ITEMS)
+            .get_certificate_list_message(LIST_MAX_ITEMS)
             .<span class="kw">await
         </span>{
             <span class="prelude-val">Ok</span>(certificates) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>certificates, StatusCode::OK)),
@@ -445,7 +445,7 @@
     <span class="doccomment">/// Certificate by certificate hash
     </span><span class="kw">pub async fn </span>certificate_certificate_hash(
         certificate_hash: String,
-        http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
+        http_message_service: Arc&lt;<span class="kw">dyn </span>MessageService&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">impl </span>warp::Reply, Infallible&gt; {
         <span class="macro">debug!</span>(
             <span class="string">&quot;⇄ HTTP SERVER: certificate_certificate_hash/{}&quot;</span>,
@@ -453,7 +453,7 @@
         );
 
         <span class="kw">match </span>http_message_service
-            .get_certificate(<span class="kw-2">&amp;</span>certificate_hash)
+            .get_certificate_message(<span class="kw-2">&amp;</span>certificate_hash)
             .<span class="kw">await
         </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(certificate)) =&gt; <span class="prelude-val">Ok</span>(reply::json(<span class="kw-2">&amp;</span>certificate, StatusCode::OK)),

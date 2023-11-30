@@ -275,7 +275,7 @@
     BeaconProvider,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::services::{EpochService, HttpMessageService};
+<span class="kw">use </span><span class="kw">crate</span>::services::{EpochService, MessageService};
 <span class="kw">use crate</span>::{
     configuration::<span class="kw-2">*</span>,
     database::provider::{CertificateRepository, SignedEntityStorer, SignerGetter, StakePoolStore},
@@ -393,7 +393,7 @@
     </span><span class="kw">pub </span>signer_getter: Arc&lt;<span class="kw">dyn </span>SignerGetter&gt;,
 
     <span class="doccomment">/// HTTP message service
-    </span><span class="kw">pub </span>http_message_service: Arc&lt;<span class="kw">dyn </span>HttpMessageService&gt;,
+    </span><span class="kw">pub </span>message_service: Arc&lt;<span class="kw">dyn </span>MessageService&gt;,
 }
 
 <span class="attr">#[doc(hidden)]
