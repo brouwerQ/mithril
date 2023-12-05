@@ -114,6 +114,7 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     digesters::cache::{ImmutableFileDigestCacheProvider, JsonImmutableFileDigestCacheProvider},
     StdResult,
@@ -121,7 +122,8 @@
 <span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>slog::{info, Logger};
 <span class="kw">use </span>std::path::Path;
-<span class="kw">use </span>tokio::fs;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">use </span>tokio::fs;
 
 <span class="doccomment">/// A [JsonImmutableFileDigestCacheProvider] builder.
 </span><span class="kw">pub struct </span>JsonImmutableFileDigestCacheProviderBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {

@@ -139,6 +139,8 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="kw">use </span><span class="kw">crate</span>::entities::{Beacon, ProtocolParameters, SignedEntityType};
@@ -170,23 +172,25 @@
 }
 
 <span class="kw">impl </span>CertificatePendingMessage {
-    <span class="doccomment">/// Provide a dummy instance for test.
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            beacon: Beacon::default(),
-            signed_entity_type: SignedEntityType::dummy(),
-            protocol_parameters: ProtocolParameters {
-                k: <span class="number">5</span>,
-                m: <span class="number">100</span>,
-                phi_f: <span class="number">0.65</span>,
-            },
-            next_protocol_parameters: ProtocolParameters {
-                k: <span class="number">50</span>,
-                m: <span class="number">1000</span>,
-                phi_f: <span class="number">0.65</span>,
-            },
-            signers: [SignerMessagePart::dummy()].to_vec(),
-            next_signers: [SignerMessagePart::dummy()].to_vec(),
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Provide a dummy instance for test.
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                beacon: Beacon::default(),
+                signed_entity_type: SignedEntityType::dummy(),
+                protocol_parameters: ProtocolParameters {
+                    k: <span class="number">5</span>,
+                    m: <span class="number">100</span>,
+                    phi_f: <span class="number">0.65</span>,
+                },
+                next_protocol_parameters: ProtocolParameters {
+                    k: <span class="number">50</span>,
+                    m: <span class="number">1000</span>,
+                    phi_f: <span class="number">0.65</span>,
+                },
+                signers: [SignerMessagePart::dummy()].to_vec(),
+                next_signers: [SignerMessagePart::dummy()].to_vec(),
+            }
         }
     }
 }

@@ -96,13 +96,17 @@
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>chrono::DateTime;
 <span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="kw">use </span><span class="kw">crate</span>::entities::Epoch;
 <span class="kw">use </span><span class="kw">crate</span>::entities::ProtocolParameters;
-<span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_data;
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_data;
 
 <span class="kw">use </span><span class="kw">super</span>::SignerWithStakeMessagePart;
 <span class="doccomment">/// Message structure of a Mithril Stake Distribution
@@ -129,17 +133,19 @@
 }
 
 <span class="kw">impl </span>MithrilStakeDistributionMessage {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            epoch: Epoch(<span class="number">1</span>),
-            signers_with_stake: <span class="macro">vec!</span>[SignerWithStakeMessagePart::dummy()],
-            hash: <span class="string">&quot;hash-123&quot;</span>.to_string(),
-            certificate_hash: <span class="string">&quot;cert-hash-123&quot;</span>.to_string(),
-            created_at: DateTime::parse_from_rfc3339(<span class="string">&quot;2023-01-19T13:43:05.618857482Z&quot;</span>)
-                .unwrap()
-                .with_timezone(<span class="kw-2">&amp;</span>Utc),
-            protocol_parameters: fake_data::protocol_parameters(),
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                epoch: Epoch(<span class="number">1</span>),
+                signers_with_stake: <span class="macro">vec!</span>[SignerWithStakeMessagePart::dummy()],
+                hash: <span class="string">&quot;hash-123&quot;</span>.to_string(),
+                certificate_hash: <span class="string">&quot;cert-hash-123&quot;</span>.to_string(),
+                created_at: DateTime::parse_from_rfc3339(<span class="string">&quot;2023-01-19T13:43:05.618857482Z&quot;</span>)
+                    .unwrap()
+                    .with_timezone(<span class="kw-2">&amp;</span>Utc),
+                protocol_parameters: fake_data::protocol_parameters(),
+            }
         }
     }
 }

@@ -23,6 +23,7 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A module used to retrieve the Certificate Chain created by an aggregator
 //!
 </span><span class="kw">use </span>async_trait::async_trait;
@@ -40,7 +41,8 @@
 
 <span class="doccomment">/// CertificateRetriever is in charge of retrieving a [Certificate] given its hash
 </span><span class="attr">#[cfg_attr(test, automock)]
-#[async_trait]
+#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>CertificateRetriever: Sync + Send {
     <span class="doccomment">/// Get [Certificate] details
     </span><span class="kw">async fn </span>get_certificate_details(

@@ -168,9 +168,9 @@
 <span class="kw">mod </span>message;
 <span class="kw">pub mod </span>mithril_stake_distribution_client;
 <span class="kw">pub mod </span>snapshot_client;
-<span class="macro">cfg_fs! </span>{
-    <span class="kw">pub mod </span>snapshot_downloader;
-}
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">pub mod </span>snapshot_downloader;
+
 <span class="kw">mod </span>type_alias;
 <span class="kw">mod </span>utils;
 

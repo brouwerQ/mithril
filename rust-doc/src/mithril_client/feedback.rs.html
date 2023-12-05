@@ -566,6 +566,9 @@
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
 <a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # Long task feedbacks
 //!
 //! Even with fast computer and network, some tasks can take more than a few
@@ -725,7 +728,8 @@
 }
 
 <span class="doccomment">/// A receiver of [MithrilEvent].
-</span><span class="attr">#[async_trait]
+</span><span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">pub trait </span>FeedbackReceiver: Sync + Send {
     <span class="doccomment">/// Callback called by a [FeedbackSender] when it needs to send an [event][MithrilEvent].
     </span><span class="kw">async fn </span>handle_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: MithrilEvent);
@@ -743,7 +747,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">impl </span>FeedbackReceiver <span class="kw">for </span>SlogFeedbackReceiver {
     <span class="kw">async fn </span>handle_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: MithrilEvent) {
         <span class="kw">match </span>event {
@@ -839,7 +844,8 @@
     }
 }
 
-<span class="attr">#[async_trait]
+<span class="attr">#[cfg_attr(target_arch = <span class="string">&quot;wasm32&quot;</span>, async_trait(<span class="question-mark">?</span>Send))]
+#[cfg_attr(not(target_arch = <span class="string">&quot;wasm32&quot;</span>), async_trait)]
 </span><span class="kw">impl </span>FeedbackReceiver <span class="kw">for </span>StackFeedbackReceiver {
     <span class="kw">async fn </span>handle_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: MithrilEvent) {
         <span class="kw">let </span><span class="kw-2">mut </span>events = <span class="self">self</span>.stacked_events.write().unwrap();

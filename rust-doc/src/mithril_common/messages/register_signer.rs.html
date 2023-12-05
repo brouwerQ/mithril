@@ -152,16 +152,20 @@
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
 <a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt::{Debug, Formatter};
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
 <span class="kw">use crate</span>::{
     crypto_helper::KESPeriod,
     entities::{
         Epoch, HexEncodedOpCert, HexEncodedVerificationKey, HexEncodedVerificationKeySignature,
         PartyId,
     },
-    test_utils::fake_keys,
 };
 
 <span class="macro">era_deprecate!</span>(<span class="string">&quot;make epoch of RegisterSignerMessage not optional&quot;</span>);
@@ -201,17 +205,19 @@
 }
 
 <span class="kw">impl </span>RegisterSignerMessage {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            epoch: <span class="prelude-val">Some</span>(Epoch(<span class="number">1</span>)),
-            party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
-            verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
-            verification_key_signature: <span class="prelude-val">Some</span>(
-                fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
-            ),
-            operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
-            kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                epoch: <span class="prelude-val">Some</span>(Epoch(<span class="number">1</span>)),
+                party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
+                verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
+                verification_key_signature: <span class="prelude-val">Some</span>(
+                    fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
+                ),
+                operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
+                kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+            }
         }
     }
 }

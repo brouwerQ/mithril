@@ -84,13 +84,13 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt::{Debug, Formatter};
 
-<span class="kw">use crate</span>::{
-    entities::{HexEncodedSingleSignature, LotteryIndex, PartyId, SignedEntityType},
-    test_utils::fake_keys,
-};
+<span class="kw">use </span><span class="kw">crate</span>::entities::{HexEncodedSingleSignature, LotteryIndex, PartyId, SignedEntityType};
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
 
 <span class="macro">era_deprecate!</span>(<span class="string">&quot;make signed_entity_type of RegisterSignatureMessage not optional&quot;</span>);
 <span class="doccomment">/// Message structure to register single signature.
@@ -112,13 +112,15 @@
 }
 
 <span class="kw">impl </span>RegisterSignatureMessage {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            signed_entity_type: <span class="prelude-val">Some</span>(SignedEntityType::dummy()),
-            party_id: <span class="string">&quot;party_id&quot;</span>.to_string(),
-            signature: fake_keys::single_signature()[<span class="number">0</span>].to_string(),
-            won_indexes: <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>],
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                signed_entity_type: <span class="prelude-val">Some</span>(SignedEntityType::dummy()),
+                party_id: <span class="string">&quot;party_id&quot;</span>.to_string(),
+                signature: fake_keys::single_signature()[<span class="number">0</span>].to_string(),
+                won_indexes: <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>],
+            }
         }
     }
 }

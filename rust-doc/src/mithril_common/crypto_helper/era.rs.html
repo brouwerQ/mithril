@@ -173,8 +173,15 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>ed25519_dalek::{Signer, SigningKey};
-<span class="kw">use </span>rand_chacha::rand_core::{<span class="self">self</span>, CryptoRng, RngCore, SeedableRng};
+<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">use </span>rand_chacha::rand_core;
+<span class="kw">use </span>rand_chacha::rand_core::{CryptoRng, RngCore, SeedableRng};
 <span class="kw">use </span>rand_chacha::ChaCha20Rng;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>thiserror::Error;
@@ -222,10 +229,12 @@
         <span class="self">Self</span>::create_test_signer(rng)
     }
 
-    <span class="doccomment">/// [EraMarkersSigner] non deterministic
-    </span><span class="kw">pub fn </span>create_non_deterministic_signer() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>rng = rand_core::OsRng;
-        <span class="self">Self</span>::create_test_signer(rng)
+    <span class="macro">cfg_random! </span>{
+        <span class="doccomment">/// [EraMarkersSigner] non deterministic
+        </span><span class="kw">pub fn </span>create_non_deterministic_signer() -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>rng = rand_core::OsRng;
+            <span class="self">Self</span>::create_test_signer(rng)
+        }
     }
 
     <span class="doccomment">/// [EraMarkersSigner] from [EraMarkersVerifierSecretKey]
@@ -289,28 +298,29 @@
             .expect(<span class="string">&quot;Decoding golden secret key should not fail&quot;</span>);
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_generate_test_deterministic_keypair() {
-        <span class="kw">let </span>signer = EraMarkersSigner::create_deterministic_signer();
-        <span class="kw">let </span>verifier = signer.create_verifier();
-        <span class="kw">let </span>signer_2 = EraMarkersSigner::create_deterministic_signer();
-        <span class="kw">let </span>verifier_2 = signer.create_verifier();
-        <span class="macro">assert_eq!</span>(signer.secret_key.to_bytes(), signer_2.secret_key.to_bytes());
-        <span class="macro">assert_eq!</span>(
-            verifier.verification_key.as_bytes(),
-            verifier_2.verification_key.as_bytes()
-        );
+    <span class="macro">cfg_random! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_generate_test_deterministic_keypair() {
+            <span class="kw">let </span>signer = EraMarkersSigner::create_deterministic_signer();
+            <span class="kw">let </span>verifier = signer.create_verifier();
+            <span class="kw">let </span>signer_2 = EraMarkersSigner::create_deterministic_signer();
+            <span class="kw">let </span>verifier_2 = signer.create_verifier();
+            <span class="macro">assert_eq!</span>(signer.secret_key.to_bytes(), signer_2.secret_key.to_bytes());
+            <span class="macro">assert_eq!</span>(
+                verifier.verification_key.as_bytes(),
+                verifier_2.verification_key.as_bytes()
+            );
 
-        <span class="macro">println!</span>(
-            <span class="string">&quot;Deterministic Verification Key={}&quot;</span>,
-            verifier.verification_key.to_json_hex().unwrap()
-        );
-        <span class="macro">println!</span>(
-            <span class="string">&quot;Deterministic Secret Key=={}&quot;</span>,
-            signer.secret_key.to_json_hex().unwrap()
-        );
+            <span class="macro">println!</span>(
+                <span class="string">&quot;Deterministic Verification Key={}&quot;</span>,
+                verifier.verification_key.to_json_hex().unwrap()
+            );
+            <span class="macro">println!</span>(
+                <span class="string">&quot;Deterministic Secret Key=={}&quot;</span>,
+                signer.secret_key.to_json_hex().unwrap()
+            );
+        }
     }
-
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_generate_test_non_deterministic_keypair() {
         <span class="kw">let </span>signer = EraMarkersSigner::create_non_deterministic_signer();

@@ -21,13 +21,22 @@
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tools to request metadata, like the current epoch or the stake distribution, from the Cardano
 
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
 </span><span class="kw">mod </span>cli_observer;
-<span class="kw">mod </span>fake_observer;
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">mod </span>fake_observer;
 <span class="kw">mod </span>interface;
 <span class="kw">mod </span>model;
-<span class="kw">mod </span>pallas_observer;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">mod </span>pallas_observer;
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test_cli_runner;
@@ -35,13 +44,16 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub use </span>cli_observer::CliRunner;
 
-<span class="kw">pub use </span>cli_observer::{CardanoCliChainObserver, CardanoCliRunner};
-<span class="kw">pub use </span>fake_observer::FakeObserver;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">pub use </span>cli_observer::{CardanoCliChainObserver, CardanoCliRunner};
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">pub use </span>fake_observer::FakeObserver;
 <span class="attr">#[cfg(test)]
 </span><span class="kw">pub use </span>interface::MockChainObserver;
 <span class="kw">pub use </span>interface::{ChainObserver, ChainObserverError};
 <span class="kw">pub use </span>model::{
     ChainAddress, TxDatum, TxDatumBuilder, TxDatumError, TxDatumFieldTypeName, TxDatumFieldValue,
 };
-<span class="kw">pub use </span>pallas_observer::PallasChainObserver;
+<span class="attr">#[cfg(feature = <span class="string">&quot;fs&quot;</span>)]
+</span><span class="kw">pub use </span>pallas_observer::PallasChainObserver;
 </code></pre></div></section></main></body></html>

@@ -328,6 +328,8 @@
 <a href="#328" id="328">328</a>
 <a href="#329" id="329">329</a>
 <a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>rand_chacha::ChaCha20Rng;
 <span class="kw">use </span>rand_core::{CryptoRng, RngCore, SeedableRng};
@@ -453,17 +455,19 @@
         ))
     }
 
-    <span class="doccomment">/// Build non deterministic [SingleSigner] and [ProtocolInitializer] based on the registered parties.
-    </span><span class="kw">pub fn </span>build_single_signer(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        signer_with_stake: SignerWithStake,
-        kes_secret_key_path: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Path&gt;,
-    ) -&gt; StdResult&lt;(SingleSigner, ProtocolInitializer)&gt; {
-        <span class="self">self</span>.build_single_signer_with_rng(
-            signer_with_stake,
-            kes_secret_key_path,
-            <span class="kw-2">&amp;mut </span>rand_core::OsRng,
-        )
+    <span class="macro">cfg_random! </span>{
+        <span class="doccomment">/// Build non deterministic [SingleSigner] and [ProtocolInitializer] based on the registered parties.
+        </span><span class="kw">pub fn </span>build_single_signer(
+            <span class="kw-2">&amp;</span><span class="self">self</span>,
+            signer_with_stake: SignerWithStake,
+            kes_secret_key_path: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Path&gt;,
+        ) -&gt; StdResult&lt;(SingleSigner, ProtocolInitializer)&gt; {
+            <span class="self">self</span>.build_single_signer_with_rng(
+                signer_with_stake,
+                kes_secret_key_path,
+                <span class="kw-2">&amp;mut </span>rand_core::OsRng,
+            )
+        }
     }
 
     <span class="doccomment">/// Build deterministic [SingleSigner] and [ProtocolInitializer] based on the registered parties.

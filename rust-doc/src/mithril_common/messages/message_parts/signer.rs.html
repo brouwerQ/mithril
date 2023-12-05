@@ -217,13 +217,19 @@
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
 <a href="#219" id="219">219</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
+<span class="kw">use crate</span>::{
     crypto_helper::{KESPeriod, ProtocolOpCert, ProtocolSignerVerificationKeySignature},
     entities::{
         HexEncodedOpCert, HexEncodedVerificationKey, HexEncodedVerificationKeySignature, PartyId,
         SignerWithStake, Stake,
     },
-    test_utils::fake_keys,
     StdResult,
 };
 <span class="kw">use </span>anyhow::Context;
@@ -265,17 +271,19 @@
 }
 
 <span class="kw">impl </span>SignerWithStakeMessagePart {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
-            verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
-            verification_key_signature: <span class="prelude-val">Some</span>(
-                fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
-            ),
-            operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
-            kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
-            stake: <span class="number">234</span>,
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
+                verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
+                verification_key_signature: <span class="prelude-val">Some</span>(
+                    fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
+                ),
+                operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
+                kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+                stake: <span class="number">234</span>,
+            }
         }
     }
 
@@ -394,16 +402,18 @@
 }
 
 <span class="kw">impl </span>SignerMessagePart {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
-            verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
-            verification_key_signature: <span class="prelude-val">Some</span>(
-                fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
-            ),
-            operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
-            kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                party_id: <span class="string">&quot;pool1m8crhnqj5k2kyszf5j2scshupystyxc887zdfrpzh6ty6eun4fx&quot;</span>.to_string(),
+                verification_key: fake_keys::signer_verification_key()[<span class="number">0</span>].to_string(),
+                verification_key_signature: <span class="prelude-val">Some</span>(
+                    fake_keys::signer_verification_key_signature()[<span class="number">0</span>].to_string(),
+                ),
+                operational_certificate: <span class="prelude-val">Some</span>(fake_keys::operational_certificate()[<span class="number">0</span>].to_string()),
+                kes_period: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+            }
         }
     }
 }

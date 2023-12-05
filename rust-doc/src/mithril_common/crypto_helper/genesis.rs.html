@@ -168,10 +168,18 @@
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{StdError, StdResult};
 <span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>ed25519_dalek::{Signer, SigningKey};
-<span class="kw">use </span>rand_chacha::rand_core::{<span class="self">self</span>, CryptoRng, RngCore, SeedableRng};
+<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+</span><span class="kw">use </span>rand_chacha::rand_core;
+<span class="kw">use </span>rand_chacha::rand_core::{CryptoRng, RngCore, SeedableRng};
 <span class="kw">use </span>rand_chacha::ChaCha20Rng;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{fs::File, io::Write, path::Path};
@@ -208,10 +216,12 @@
         <span class="self">Self</span>::create_test_genesis_signer(rng)
     }
 
-    <span class="doccomment">/// [ProtocolGenesisSigner] non deterministic
-    </span><span class="kw">pub fn </span>create_non_deterministic_genesis_signer() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>rng = rand_core::OsRng;
-        <span class="self">Self</span>::create_test_genesis_signer(rng)
+    <span class="macro">cfg_random! </span>{
+        <span class="doccomment">/// [ProtocolGenesisSigner] non deterministic
+        </span><span class="kw">pub fn </span>create_non_deterministic_genesis_signer() -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>rng = rand_core::OsRng;
+            <span class="self">Self</span>::create_test_genesis_signer(rng)
+        }
     }
 
     <span class="doccomment">/// [ProtocolGenesisSigner] from [ProtocolGenesisSecretKey]
@@ -301,19 +311,21 @@
         );
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_generate_test_non_deterministic_genesis_keypair() {
-        <span class="kw">let </span>genesis_signer = ProtocolGenesisSigner::create_non_deterministic_genesis_signer();
-        <span class="kw">let </span>genesis_verifier = genesis_signer.create_genesis_verifier();
+    <span class="macro">cfg_random! </span>{
+        <span class="attr">#[test]
+        </span><span class="kw">fn </span>test_generate_test_non_deterministic_genesis_keypair() {
+            <span class="kw">let </span>genesis_signer = ProtocolGenesisSigner::create_non_deterministic_genesis_signer();
+            <span class="kw">let </span>genesis_verifier = genesis_signer.create_genesis_verifier();
 
-        <span class="macro">println!</span>(
-            <span class="string">&quot;Non Deterministic Genesis Verification Key={}&quot;</span>,
-            genesis_verifier.verification_key.to_json_hex().unwrap()
-        );
-        <span class="macro">println!</span>(
-            <span class="string">&quot;Non Deterministic Genesis Secret Key=={}&quot;</span>,
-            genesis_signer.secret_key.to_json_hex().unwrap()
-        );
+            <span class="macro">println!</span>(
+                <span class="string">&quot;Non Deterministic Genesis Verification Key={}&quot;</span>,
+                genesis_verifier.verification_key.to_json_hex().unwrap()
+            );
+            <span class="macro">println!</span>(
+                <span class="string">&quot;Non Deterministic Genesis Secret Key=={}&quot;</span>,
+                genesis_signer.secret_key.to_json_hex().unwrap()
+            );
+        }
     }
 
     <span class="attr">#[test]

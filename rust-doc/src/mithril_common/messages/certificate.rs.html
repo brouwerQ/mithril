@@ -308,16 +308,22 @@
 <a href="#308" id="308">308</a>
 <a href="#309" id="309">309</a>
 <a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::fmt::{Debug, Formatter};
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::entities::ProtocolMessagePartKey;
 <span class="kw">use </span><span class="kw">crate</span>::entities::{
     Beacon, Certificate, CertificateMetadata, CertificateSignature, ProtocolMessage,
-    ProtocolMessagePartKey,
 };
 <span class="kw">use </span><span class="kw">crate</span>::messages::CertificateMetadataMessagePart;
-<span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
+<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_keys;
 <span class="kw">use </span><span class="kw">crate</span>::StdError;
 
 <span class="doccomment">/// Message structure of a certificate
@@ -365,27 +371,29 @@
 }
 
 <span class="kw">impl </span>CertificateMessage {
-    <span class="doccomment">/// Return a dummy test entity (test-only).
-    </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>protocol_message = ProtocolMessage::new();
-        protocol_message.set_message_part(
-            ProtocolMessagePartKey::SnapshotDigest,
-            <span class="string">&quot;snapshot-digest-123&quot;</span>.to_string(),
-        );
-        protocol_message.set_message_part(
-            ProtocolMessagePartKey::NextAggregateVerificationKey,
-            fake_keys::aggregate_verification_key()[<span class="number">1</span>].to_owned(),
-        );
-        <span class="self">Self </span>{
-            hash: <span class="string">&quot;hash&quot;</span>.to_string(),
-            previous_hash: <span class="string">&quot;previous_hash&quot;</span>.to_string(),
-            beacon: Beacon::new(<span class="string">&quot;testnet&quot;</span>.to_string(), <span class="number">10</span>, <span class="number">100</span>),
-            metadata: CertificateMetadataMessagePart::dummy(),
-            protocol_message: protocol_message.clone(),
-            signed_message: <span class="string">&quot;signed_message&quot;</span>.to_string(),
-            aggregate_verification_key: fake_keys::aggregate_verification_key()[<span class="number">0</span>].to_owned(),
-            multi_signature: fake_keys::multi_signature()[<span class="number">0</span>].to_owned(),
-            genesis_signature: String::new(),
+    <span class="macro">cfg_test_tools! </span>{
+        <span class="doccomment">/// Return a dummy test entity (test-only).
+        </span><span class="kw">pub fn </span>dummy() -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>protocol_message = ProtocolMessage::new();
+            protocol_message.set_message_part(
+                ProtocolMessagePartKey::SnapshotDigest,
+                <span class="string">&quot;snapshot-digest-123&quot;</span>.to_string(),
+            );
+            protocol_message.set_message_part(
+                ProtocolMessagePartKey::NextAggregateVerificationKey,
+                fake_keys::aggregate_verification_key()[<span class="number">1</span>].to_owned(),
+            );
+            <span class="self">Self </span>{
+                hash: <span class="string">&quot;hash&quot;</span>.to_string(),
+                previous_hash: <span class="string">&quot;previous_hash&quot;</span>.to_string(),
+                beacon: Beacon::new(<span class="string">&quot;testnet&quot;</span>.to_string(), <span class="number">10</span>, <span class="number">100</span>),
+                metadata: CertificateMetadataMessagePart::dummy(),
+                protocol_message: protocol_message.clone(),
+                signed_message: <span class="string">&quot;signed_message&quot;</span>.to_string(),
+                aggregate_verification_key: fake_keys::aggregate_verification_key()[<span class="number">0</span>].to_owned(),
+                multi_signature: fake_keys::multi_signature()[<span class="number">0</span>].to_owned(),
+                genesis_signature: String::new(),
+            }
         }
     }
 
