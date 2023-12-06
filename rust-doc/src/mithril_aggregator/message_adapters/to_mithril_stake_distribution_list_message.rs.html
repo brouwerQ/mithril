@@ -52,27 +52,6 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mithril_common::entities::{MithrilStakeDistribution, SignedEntity};
 <span class="kw">use </span>mithril_common::messages::{
     MithrilStakeDistributionListItemMessage, MithrilStakeDistributionListMessage, ToMessageAdapter,
@@ -105,42 +84,21 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>chrono::{DateTime, Utc};
-    <span class="kw">use </span>mithril_common::{
-        entities::{Epoch, SignedEntityType},
-        test_utils::fake_data,
-    };
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>adapt_ok() {
-        <span class="kw">let </span>mithril_stake_distribution = MithrilStakeDistribution {
-            epoch: Epoch(<span class="number">1</span>),
-            signers_with_stake: fake_data::signers_with_stakes(<span class="number">1</span>),
-            hash: <span class="string">&quot;hash-123&quot;</span>.to_string(),
-            protocol_parameters: fake_data::protocol_parameters(),
-        };
-        <span class="kw">let </span>signed_entity = SignedEntity {
-            signed_entity_id: <span class="string">&quot;signed-entity-id-123&quot;</span>.to_string(),
-            signed_entity_type: SignedEntityType::MithrilStakeDistribution(Epoch(<span class="number">0</span>)),
-            certificate_id: <span class="string">&quot;certificate-hash-123&quot;</span>.to_string(),
-            artifact: mithril_stake_distribution,
-            created_at: DateTime::parse_from_rfc3339(<span class="string">&quot;2023-01-19T13:43:05.618857482Z&quot;</span>)
-                .unwrap()
-                .with_timezone(<span class="kw-2">&amp;</span>Utc),
-        };
-        <span class="kw">let </span>mithril_stake_distribution_list_message =
-            ToMithrilStakeDistributionListMessageAdapter::adapt(<span class="macro">vec!</span>[signed_entity]);
+        <span class="kw">let </span>signed_entity = SignedEntity::&lt;MithrilStakeDistribution&gt;::dummy();
         <span class="kw">let </span>mithril_stake_distribution_list_message_expected =
             <span class="macro">vec!</span>[MithrilStakeDistributionListItemMessage {
-                epoch: Epoch(<span class="number">1</span>),
-                hash: <span class="string">&quot;hash-123&quot;</span>.to_string(),
-                certificate_hash: <span class="string">&quot;certificate-hash-123&quot;</span>.to_string(),
-                created_at: DateTime::parse_from_rfc3339(<span class="string">&quot;2023-01-19T13:43:05.618857482Z&quot;</span>)
-                    .unwrap()
-                    .with_timezone(<span class="kw-2">&amp;</span>Utc),
+                epoch: signed_entity.artifact.epoch,
+                hash: signed_entity.artifact.hash.clone(),
+                certificate_hash: signed_entity.certificate_id.clone(),
+                created_at: signed_entity.created_at,
             }];
+
+        <span class="kw">let </span>mithril_stake_distribution_list_message =
+            ToMithrilStakeDistributionListMessageAdapter::adapt(<span class="macro">vec!</span>[signed_entity]);
 
         <span class="macro">assert_eq!</span>(
             mithril_stake_distribution_list_message_expected,
