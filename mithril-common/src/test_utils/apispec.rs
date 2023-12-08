@@ -150,8 +150,8 @@ impl<'a> APISpec<'a> {
                 let schema = &mut schema.as_object_mut().unwrap().clone();
                 let components = self.openapi["components"].clone();
                 schema.insert(String::from("components"), components);
-
                 let validator = JSONSchema::compile(&json!(schema)).unwrap();
+
                 match validator.validate(value).map_err(|errs| {
                     errs.into_iter()
                         .map(|e| e.to_string())
