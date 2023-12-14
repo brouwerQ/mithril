@@ -58,6 +58,13 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>cli_table::{format::Justify, print_stdout, Cell, Table};
 <span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder};
@@ -66,7 +73,7 @@
 
 <span class="kw">use </span>mithril_client::ClientBuilder;
 <span class="kw">use </span>mithril_client_cli::configuration::ConfigParameters;
-<span class="kw">use </span>mithril_common::StdResult;
+<span class="kw">use </span>mithril_common::{test_utils::fake_keys, StdResult};
 
 <span class="doccomment">/// Mithril stake distribution LIST command
 </span><span class="attr">#[derive(Parser, Debug, Clone)]
@@ -83,9 +90,16 @@
         <span class="kw">let </span>params = Arc::new(ConfigParameters::new(
             config.try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()<span class="question-mark">?</span>,
         ));
+        <span class="comment">// TODO: This should not be done this way.
+        // Now that mithril-client-cli uses the mithril-client library, the genesis verification key is required for all commands
+        </span><span class="kw">let </span>fallback_genesis_verification_key =
+            fake_keys::genesis_verification_key()[<span class="number">0</span>].to_string();
         <span class="kw">let </span>client = ClientBuilder::aggregator(
             <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;aggregator_endpoint&quot;</span>)<span class="question-mark">?</span>,
-            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;genesis_verification_key&quot;</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;</span>params.get_or(
+                <span class="string">&quot;genesis_verification_key&quot;</span>,
+                <span class="kw-2">&amp;</span>fallback_genesis_verification_key,
+            ),
         )
         .with_logger(logger())
         .build()<span class="question-mark">?</span>;

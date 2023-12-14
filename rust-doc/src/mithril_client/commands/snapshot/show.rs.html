@@ -105,6 +105,13 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>cli_table::{print_stdout, Cell, Table};
@@ -114,7 +121,7 @@
 
 <span class="kw">use </span>mithril_client::ClientBuilder;
 <span class="kw">use </span>mithril_client_cli::{configuration::ConfigParameters, utils::ExpanderUtils};
-<span class="kw">use </span>mithril_common::StdResult;
+<span class="kw">use </span>mithril_common::{test_utils::fake_keys, StdResult};
 
 <span class="doccomment">/// Clap command to show a given snapshot
 </span><span class="attr">#[derive(Parser, Debug, Clone)]
@@ -136,9 +143,16 @@
         <span class="kw">let </span>params = Arc::new(ConfigParameters::new(
             config.try_deserialize::&lt;HashMap&lt;String, String&gt;&gt;()<span class="question-mark">?</span>,
         ));
+        <span class="comment">// TODO: This should not be done this way.
+        // Now that mithril-client-cli uses the mithril-client library, the genesis verification key is required for all commands
+        </span><span class="kw">let </span>fallback_genesis_verification_key =
+            fake_keys::genesis_verification_key()[<span class="number">0</span>].to_string();
         <span class="kw">let </span>client = ClientBuilder::aggregator(
             <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;aggregator_endpoint&quot;</span>)<span class="question-mark">?</span>,
-            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;genesis_verification_key&quot;</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;</span>params.get_or(
+                <span class="string">&quot;genesis_verification_key&quot;</span>,
+                <span class="kw-2">&amp;</span>fallback_genesis_verification_key,
+            ),
         )
         .with_logger(logger())
         .build()<span class="question-mark">?</span>;
