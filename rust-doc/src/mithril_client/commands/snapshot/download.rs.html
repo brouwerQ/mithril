@@ -245,7 +245,10 @@
 <a href="#245" id="245">245</a>
 <a href="#246" id="246">246</a>
 <a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
+<span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder, Map, Source, Value, ValueKind};
 <span class="kw">use </span>slog_scope::{debug, logger, warn};
@@ -430,7 +433,8 @@
 
         <span class="kw">if </span><span class="self">self</span>.json {
             <span class="macro">println!</span>(
-                <span class="string">r#&quot;{{&quot;db_directory&quot;: &quot;{}&quot;}}&quot;#</span>,
+                <span class="string">r#&quot;{{&quot;timestamp&quot;: &quot;{}&quot;, &quot;db_directory&quot;: &quot;{}&quot;}}&quot;#</span>,
+                Utc::now().to_rfc3339(),
                 canonicalized_filepath.display()
             );
         } <span class="kw">else </span>{

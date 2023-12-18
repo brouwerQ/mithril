@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ArtifactCommands"],"fn":["main"],"mod":["commands"],"struct":["Args"]};
+window.SIDEBAR_ITEMS = {"enum":["ArtifactCommands","LogOutputType"],"fn":["main"],"mod":["commands"],"struct":["Args"]};

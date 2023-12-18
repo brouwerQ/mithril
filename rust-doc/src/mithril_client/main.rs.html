@@ -127,23 +127,100 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
 </pre></div><pre class="rust"><code><span class="attr">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 
 </span><span class="kw">mod </span>commands;
 
-<span class="kw">use </span>std::path::PathBuf;
-<span class="kw">use </span>std::sync::Arc;
-
+<span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>clap::{Parser, Subcommand};
 <span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder, Map, Source, Value, ValueKind};
-<span class="kw">use </span>slog::{Drain, Level, Logger};
+<span class="kw">use </span>slog::{Drain, Fuse, Level, Logger};
+<span class="kw">use </span>slog_async::Async;
 <span class="kw">use </span>slog_scope::debug;
+<span class="kw">use </span>slog_term::Decorator;
+<span class="kw">use </span>std::io::Write;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::{fs::File, path::PathBuf};
 
 <span class="kw">use </span>mithril_client_cli::common::StdResult;
 
 <span class="kw">use </span>commands::{
     mithril_stake_distribution::MithrilStakeDistributionCommands, snapshot::SnapshotCommands,
 };
+
+<span class="kw">enum </span>LogOutputType {
+    Stdout,
+    File(String),
+}
+
+<span class="kw">impl </span>LogOutputType {
+    <span class="kw">fn </span>get_writer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;Box&lt;<span class="kw">dyn </span>Write + Send&gt;&gt; {
+        <span class="kw">let </span>writer: Box&lt;<span class="kw">dyn </span>Write + Send&gt; = <span class="kw">match </span><span class="self">self </span>{
+            LogOutputType::Stdout =&gt; Box::new(std::io::stdout()),
+            LogOutputType::File(filepath) =&gt; Box::new(
+                File::create(filepath)
+                    .with_context(|| <span class="macro">format!</span>(<span class="string">&quot;Can not create output log file: {}&quot;</span>, filepath))<span class="question-mark">?</span>,
+            ),
+        };
+
+        <span class="prelude-val">Ok</span>(writer)
+    }
+}
 
 <span class="attr">#[derive(Parser, Debug, Clone)]
 #[clap(name = <span class="string">&quot;mithril-client&quot;</span>)]
@@ -172,6 +249,14 @@
     <span class="doccomment">/// Override configuration Aggregator endpoint URL.
     </span><span class="attr">#[clap(long, env = <span class="string">&quot;AGGREGATOR_ENDPOINT&quot;</span>)]
     </span>aggregator_endpoint: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
+    <span class="doccomment">/// Enable JSON output for logs displayed according to verbosity level
+    </span><span class="attr">#[clap(long)]
+    </span>log_format_json: bool,
+
+    <span class="doccomment">/// Redirect the logs to a file
+    </span><span class="attr">#[clap(long, alias(<span class="string">&quot;o&quot;</span>))]
+    </span>log_output: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="kw">impl </span>Args {
@@ -197,13 +282,38 @@
         }
     }
 
-    <span class="kw">fn </span>build_logger(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Logger {
-        <span class="kw">let </span>decorator = slog_term::TermDecorator::new().build();
+    <span class="kw">fn </span>get_log_output_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LogOutputType {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(output_filepath) = <span class="kw-2">&amp;</span><span class="self">self</span>.log_output {
+            LogOutputType::File(output_filepath.to_string())
+        } <span class="kw">else </span>{
+            LogOutputType::Stdout
+        }
+    }
+
+    <span class="kw">fn </span>wrap_drain&lt;D: Decorator + Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, decorator: D) -&gt; Fuse&lt;Async&gt; {
         <span class="kw">let </span>drain = slog_term::CompactFormat::new(decorator).build().fuse();
         <span class="kw">let </span>drain = slog::LevelFilter::new(drain, <span class="self">self</span>.log_level()).fuse();
-        <span class="kw">let </span>drain = slog_async::Async::new(drain).build().fuse();
 
-        Logger::root(Arc::new(drain), <span class="macro">slog::o!</span>())
+        slog_async::Async::new(drain).build().fuse()
+    }
+
+    <span class="kw">fn </span>build_logger(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;Logger&gt; {
+        <span class="kw">let </span>log_output_type = <span class="self">self</span>.get_log_output_type();
+        <span class="kw">let </span>writer = log_output_type.get_writer()<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>drain = <span class="kw">if </span><span class="self">self</span>.log_format_json {
+            <span class="kw">let </span>drain = slog_bunyan::new(writer).set_pretty(<span class="bool-val">false</span>).build().fuse();
+            <span class="kw">let </span>drain = slog::LevelFilter::new(drain, <span class="self">self</span>.log_level()).fuse();
+
+            slog_async::Async::new(drain).build().fuse()
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>log_output_type {
+                LogOutputType::Stdout =&gt; <span class="self">self</span>.wrap_drain(slog_term::TermDecorator::new().build()),
+                LogOutputType::File(<span class="kw">_</span>) =&gt; <span class="self">self</span>.wrap_drain(slog_term::PlainDecorator::new(writer)),
+            }
+        };
+
+        <span class="prelude-val">Ok</span>(Logger::root(Arc::new(drain), <span class="macro">slog::o!</span>()))
     }
 }
 
@@ -249,7 +359,7 @@
 </span><span class="kw">async fn </span>main() -&gt; StdResult&lt;()&gt; {
     <span class="comment">// Load args
     </span><span class="kw">let </span>args = Args::parse();
-    <span class="kw">let </span>_guard = slog_scope::set_global_logger(args.build_logger());
+    <span class="kw">let </span>_guard = slog_scope::set_global_logger(args.build_logger()<span class="question-mark">?</span>);
 
     <span class="attr">#[cfg(feature = <span class="string">&quot;bundle_openssl&quot;</span>)]
     </span>openssl_probe::init_ssl_cert_env_vars();
