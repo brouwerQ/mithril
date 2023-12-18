@@ -151,6 +151,26 @@
 <a href="#151" id="151">151</a>
 <a href="#152" id="152">152</a>
 <a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>chrono::{DateTime, Utc};
 <span class="kw">use </span>mithril_common::entities::{
     Epoch, PartyId, ProtocolMessage, SignedEntityType, SingleSignatures,
@@ -177,11 +197,17 @@
     <span class="doccomment">/// Has this message been converted into a Certificate?
     </span><span class="kw">pub </span>is_certified: bool,
 
+    <span class="doccomment">/// Has this open message expired
+    </span><span class="kw">pub </span>is_expired: bool,
+
     <span class="doccomment">/// associated single signatures
     </span><span class="kw">pub </span>single_signatures: Vec&lt;SingleSignatures&gt;,
 
     <span class="doccomment">/// Message creation datetime
     </span><span class="kw">pub </span>created_at: DateTime&lt;Utc&gt;,
+
+    <span class="doccomment">/// Message expiration datetime, if it exists.
+    </span><span class="kw">pub </span>expires_at: <span class="prelude-ty">Option</span>&lt;DateTime&lt;Utc&gt;&gt;,
 }
 
 <span class="kw">impl </span>OpenMessage {
@@ -207,11 +233,13 @@
             signed_entity_type,
             protocol_message: ProtocolMessage::new(),
             is_certified: <span class="bool-val">false</span>,
+            is_expired: <span class="bool-val">false</span>,
             single_signatures: <span class="macro">vec!</span>[
                 fake_data::single_signatures(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>]),
                 fake_data::single_signatures(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">8</span>]),
             ],
             created_at: Utc::now(),
+            expires_at: <span class="prelude-val">None</span>,
         }
     }
 }
@@ -223,8 +251,10 @@
             signed_entity_type: record.signed_entity_type,
             protocol_message: record.protocol_message,
             is_certified: record.is_certified,
+            is_expired: record.is_expired,
             single_signatures: <span class="macro">vec!</span>[],
             created_at: record.created_at,
+            expires_at: record.expires_at,
         }
     }
 }
@@ -236,8 +266,10 @@
             signed_entity_type: record.signed_entity_type,
             protocol_message: record.protocol_message,
             is_certified: record.is_certified,
+            is_expired: record.is_expired,
             single_signatures: record.single_signatures,
             created_at: record.created_at,
+            expires_at: record.expires_at,
         }
     }
 }
@@ -264,15 +296,19 @@
             signed_entity_type: SignedEntityType::dummy(),
             protocol_message: ProtocolMessage::default(),
             is_certified: <span class="bool-val">false</span>,
+            is_expired: <span class="bool-val">false</span>,
             created_at,
+            expires_at: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>expected = OpenMessage {
             epoch: Epoch(<span class="number">1</span>),
             signed_entity_type: SignedEntityType::dummy(),
             protocol_message: ProtocolMessage::default(),
             is_certified: <span class="bool-val">false</span>,
+            is_expired: <span class="bool-val">false</span>,
             single_signatures: <span class="macro">vec!</span>[],
             created_at,
+            expires_at: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>result: OpenMessage = record.into();
 
@@ -288,7 +324,9 @@
             signed_entity_type: SignedEntityType::dummy(),
             protocol_message: ProtocolMessage::default(),
             is_certified: <span class="bool-val">false</span>,
+            is_expired: <span class="bool-val">false</span>,
             created_at,
+            expires_at: <span class="prelude-val">None</span>,
             single_signatures: <span class="macro">vec!</span>[fake_data::single_signatures(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>])],
         };
         <span class="kw">let </span>expected = OpenMessage {
@@ -296,8 +334,10 @@
             signed_entity_type: SignedEntityType::dummy(),
             protocol_message: ProtocolMessage::default(),
             is_certified: <span class="bool-val">false</span>,
+            is_expired: <span class="bool-val">false</span>,
             single_signatures: <span class="macro">vec!</span>[fake_data::single_signatures(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">4</span>, <span class="number">5</span>])],
             created_at,
+            expires_at: <span class="prelude-val">None</span>,
         };
         <span class="kw">let </span>result: OpenMessage = record.into();
 

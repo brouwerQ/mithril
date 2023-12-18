@@ -257,6 +257,12 @@
 <a href="#257" id="257">257</a>
 <a href="#258" id="258">258</a>
 <a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 <span class="kw">use </span>tokio::sync::RwLock;
 
@@ -275,7 +281,6 @@
     BeaconProvider,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::services::{EpochService, MessageService};
 <span class="kw">use crate</span>::{
     configuration::<span class="kw-2">*</span>,
     database::provider::{CertificateRepository, SignedEntityStorer, SignerGetter, StakePoolStore},
@@ -286,6 +291,10 @@
     snapshot_uploaders::SnapshotUploader,
     CertificatePendingStore, ProtocolParametersStorer, SignerRegisterer,
     SignerRegistrationRoundOpener, Snapshotter, VerificationKeyStorer,
+};
+<span class="kw">use crate</span>::{
+    database::provider::OpenMessageRepository,
+    services::{EpochService, MessageService},
 };
 
 <span class="doccomment">/// MultiSignerWrapper wraps a [MultiSigner]
@@ -319,6 +328,9 @@
 
     <span class="doccomment">/// Certificate store.
     </span><span class="kw">pub </span>certificate_repository: Arc&lt;CertificateRepository&gt;,
+
+    <span class="doccomment">/// Open message store.
+    </span><span class="kw">pub </span>open_message_repository: Arc&lt;OpenMessageRepository&gt;,
 
     <span class="doccomment">/// Verification key store.
     </span><span class="kw">pub </span>verification_key_store: Arc&lt;<span class="kw">dyn </span>VerificationKeyStorer&gt;,

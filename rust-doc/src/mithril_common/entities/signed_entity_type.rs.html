@@ -120,8 +120,33 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::StdResult;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::time::Duration;
 <span class="kw">use </span>strum::{Display, EnumDiscriminants};
 
 <span class="macro">cfg_database! </span>{
@@ -226,6 +251,29 @@
         };
 
         <span class="prelude-val">Ok</span>(value)
+    }
+
+    <span class="doccomment">/// Return the associated open message timeout
+    </span><span class="kw">pub fn </span>get_open_message_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MithrilStakeDistribution(<span class="kw">_</span>) | <span class="self">Self</span>::CardanoImmutableFilesFull(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::CardanoStakeDistribution(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">600</span>)),
+        }
+    }
+
+    <span class="doccomment">/// Create a SignedEntityType from beacon and SignedEntityTypeDiscriminants
+    </span><span class="kw">pub fn </span>from_beacon(discriminant: <span class="kw-2">&amp;</span>SignedEntityTypeDiscriminants, beacon: <span class="kw-2">&amp;</span>Beacon) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>discriminant {
+            SignedEntityTypeDiscriminants::MithrilStakeDistribution =&gt; {
+                <span class="self">Self</span>::MithrilStakeDistribution(beacon.epoch)
+            }
+            SignedEntityTypeDiscriminants::CardanoStakeDistribution =&gt; {
+                <span class="self">Self</span>::CardanoStakeDistribution(beacon.epoch)
+            }
+            SignedEntityTypeDiscriminants::CardanoImmutableFilesFull =&gt; {
+                <span class="self">Self</span>::CardanoImmutableFilesFull(beacon.to_owned())
+            }
+        }
     }
 }
 

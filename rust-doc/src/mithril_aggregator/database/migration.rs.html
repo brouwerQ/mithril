@@ -603,6 +603,15 @@
 <a href="#603" id="603">603</a>
 <a href="#604" id="604">604</a>
 <a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Migration module
 //!
 </span><span class="kw">use </span>mithril_common::database::SqlMigration;
@@ -1204,6 +1213,15 @@ where signed_entity.signed_entity_type_id = 2;
             <span class="string">r#&quot;
 alter table signer add column last_registered_at text null;
 update signer set last_registered_at = created_at; 
+        &quot;#</span>,
+        ),
+        <span class="comment">// Migration 20
+        // Alter `open_message` table to add `expires_at` and &#39;is_expired&#39; fields
+        </span>SqlMigration::new(
+            <span class="number">20</span>,
+            <span class="string">r#&quot;
+alter table open_message add column is_expired bool not null default false;
+alter table open_message add column expires_at text null;
         &quot;#</span>,
         ),
     ]
