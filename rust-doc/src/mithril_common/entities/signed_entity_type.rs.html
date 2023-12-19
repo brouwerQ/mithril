@@ -144,10 +144,11 @@
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::StdResult;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::time::Duration;
-<span class="kw">use </span>strum::{Display, EnumDiscriminants};
+<span class="kw">use </span>strum::{Display, EnumDiscriminants, EnumString};
 
 <span class="macro">cfg_database! </span>{
     <span class="kw">use crate</span>::{sqlite::HydrationError};
@@ -172,6 +173,7 @@
 /// variants.
 </span><span class="attr">#[derive(Display, Debug, Clone, PartialEq, Eq, Serialize, Deserialize, EnumDiscriminants)]
 #[strum(serialize_all = <span class="string">&quot;PascalCase&quot;</span>)]
+#[strum_discriminants(derive(EnumString))]
 </span><span class="kw">pub enum </span>SignedEntityType {
     <span class="doccomment">/// Mithril stake distribution
     </span>MithrilStakeDistribution(Epoch),

@@ -429,6 +429,10 @@
 <a href="#429" id="429">429</a>
 <a href="#430" id="430">430</a>
 <a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>config::{ConfigError, Map, Source, Value, ValueKind};
 <span class="kw">use </span>mithril_common::crypto_helper::ProtocolGenesisSigner;
@@ -546,6 +550,9 @@
     <span class="doccomment">/// Era reader adapter parameters
     </span><span class="kw">pub </span>era_reader_adapter_params: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
+    <span class="doccomment">/// Signed entity types parameters (discriminants names in an ordered comma separated list).
+    </span><span class="kw">pub </span>signed_entity_types: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
     <span class="doccomment">/// Compression algorithm used for the snapshot archive artifacts.
     </span><span class="kw">pub </span>snapshot_compression_algorithm: CompressionAlgorithm,
 
@@ -623,6 +630,7 @@
             store_retention_limit: <span class="prelude-val">None</span>,
             era_reader_adapter_type: EraReaderAdapterType::Bootstrap,
             era_reader_adapter_params: <span class="prelude-val">None</span>,
+            signed_entity_types: <span class="prelude-val">None</span>,
             snapshot_compression_algorithm: CompressionAlgorithm::Zstandard,
             zstandard_parameters: <span class="prelude-val">Some</span>(ZstandardCompressionParameters::default()),
             cexplorer_pools_url: <span class="prelude-val">None</span>,
