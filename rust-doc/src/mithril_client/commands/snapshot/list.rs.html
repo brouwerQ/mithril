@@ -74,12 +74,12 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>cli_table::{format::Justify, print_stdout, Cell, Table};
 <span class="kw">use </span>config::{builder::DefaultState, ConfigBuilder};
-<span class="kw">use </span>mithril_common::test_utils::fake_keys;
 <span class="kw">use </span>slog_scope::logger;
 <span class="kw">use </span>std::{collections::HashMap, sync::Arc};
 
 <span class="kw">use </span>mithril_client::ClientBuilder;
-<span class="kw">use </span>mithril_client_cli::{common::StdResult, configuration::ConfigParameters};
+<span class="kw">use </span>mithril_client_cli::configuration::ConfigParameters;
+<span class="kw">use </span>mithril_common::{test_utils::fake_keys, StdResult};
 
 <span class="doccomment">/// Clap command to list existing snapshots
 </span><span class="attr">#[derive(Parser, Debug, Clone)]

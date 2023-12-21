@@ -247,6 +247,92 @@
 <a href="#247" id="247">247</a>
 <a href="#248" id="248">248</a>
 <a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>chrono::Utc;
 <span class="kw">use </span>clap::Parser;
@@ -259,7 +345,9 @@
     sync::Arc,
 };
 
-<span class="kw">use </span>mithril_client::{ClientBuilder, MessageBuilder};
+<span class="kw">use </span>mithril_client::{
+    common::ProtocolMessage, Client, ClientBuilder, MessageBuilder, MithrilCertificate, Snapshot,
+};
 <span class="kw">use </span>mithril_client_cli::{
     configuration::ConfigParameters,
     utils::{
@@ -339,58 +427,112 @@
             .<span class="kw">await</span><span class="question-mark">?
             </span>.with_context(|| <span class="macro">format!</span>(<span class="string">&quot;Can not get the snapshot for digest: &#39;{}&#39;&quot;</span>, <span class="self">self</span>.digest))<span class="question-mark">?</span>;
 
-        progress_printer.report_step(<span class="number">1</span>, <span class="string">&quot;Checking local disk info…&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = SnapshotUnpacker::check_prerequisites(
+        <span class="self">Self</span>::check_local_disk_info(<span class="number">1</span>, <span class="kw-2">&amp;</span>progress_printer, <span class="kw-2">&amp;</span>db_dir, <span class="kw-2">&amp;</span>snapshot_message)<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>certificate = <span class="self">Self</span>::fetch_certificate_and_verifying_chain(
+            <span class="number">2</span>,
+            <span class="kw-2">&amp;</span>progress_printer,
+            <span class="kw-2">&amp;</span>client,
+            <span class="kw-2">&amp;</span>snapshot_message.certificate_hash,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="self">Self</span>::download_and_unpack_snapshot(
+            <span class="number">3</span>,
+            <span class="kw-2">&amp;</span>progress_printer,
+            <span class="kw-2">&amp;</span>client,
+            <span class="kw-2">&amp;</span>snapshot_message,
             <span class="kw-2">&amp;</span>db_dir,
-            snapshot_message.size,
-            snapshot_message.compression_algorithm.unwrap_or_default(),
+        )
+        .<span class="kw">await
+        </span>.with_context(|| {
+            <span class="macro">format!</span>(
+                <span class="string">&quot;Can not get download and unpack snapshot for digest: &#39;{}&#39;&quot;</span>,
+                <span class="self">self</span>.digest
+            )
+        })<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>message =
+            <span class="self">Self</span>::compute_snapshot_message(<span class="number">4</span>, <span class="kw-2">&amp;</span>progress_printer, <span class="kw-2">&amp;</span>certificate, <span class="kw-2">&amp;</span>db_dir).<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="self">Self</span>::verify_snapshot_signature(
+            <span class="number">5</span>,
+            <span class="kw-2">&amp;</span>progress_printer,
+            <span class="kw-2">&amp;</span>certificate,
+            <span class="kw-2">&amp;</span>message,
+            <span class="kw-2">&amp;</span>snapshot_message,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        <span class="self">Self</span>::log_download_information(<span class="kw-2">&amp;</span>db_dir, <span class="kw-2">&amp;</span>snapshot_message, <span class="self">self</span>.json)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>check_local_disk_info(
+        step_number: u16,
+        progress_printer: <span class="kw-2">&amp;</span>ProgressPrinter,
+        db_dir: <span class="kw-2">&amp;</span>PathBuf,
+        snapshot: <span class="kw-2">&amp;</span>Snapshot,
+    ) -&gt; StdResult&lt;()&gt; {
+        progress_printer.report_step(step_number, <span class="string">&quot;Checking local disk info…&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = SnapshotUnpacker::check_prerequisites(
+            db_dir,
+            snapshot.size,
+            snapshot.compression_algorithm.unwrap_or_default(),
         ) {
-            progress_printer.report_step(<span class="number">1</span>, <span class="kw-2">&amp;</span>SnapshotUtils::check_disk_space_error(e)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+            progress_printer
+                .report_step(step_number, <span class="kw-2">&amp;</span>SnapshotUtils::check_disk_space_error(e)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
         }
 
-        std::fs::create_dir_all(<span class="kw-2">&amp;</span>db_dir).with_context(|| {
+        std::fs::create_dir_all(db_dir).with_context(|| {
             <span class="macro">format!</span>(
                 <span class="string">&quot;Download: could not create target directory &#39;{}&#39;.&quot;</span>,
                 db_dir.display()
             )
         })<span class="question-mark">?</span>;
 
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async fn </span>fetch_certificate_and_verifying_chain(
+        step_number: u16,
+        progress_printer: <span class="kw-2">&amp;</span>ProgressPrinter,
+        client: <span class="kw-2">&amp;</span>Client,
+        certificate_hash: <span class="kw-2">&amp;</span>str,
+    ) -&gt; StdResult&lt;MithrilCertificate&gt; {
         progress_printer.report_step(
-            <span class="number">2</span>,
+            step_number,
             <span class="string">&quot;Fetching the certificate and verifying the certificate chain…&quot;</span>,
         )<span class="question-mark">?</span>;
         <span class="kw">let </span>certificate = client
             .certificate()
-            .verify_chain(<span class="kw-2">&amp;</span>snapshot_message.certificate_hash)
+            .verify_chain(certificate_hash)
             .<span class="kw">await
             </span>.with_context(|| {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;Can not verify the certificate chain from certificate_hash: &#39;{}&#39;&quot;</span>,
-                    <span class="kw-2">&amp;</span>snapshot_message.certificate_hash
+                    certificate_hash
                 )
             })<span class="question-mark">?</span>;
 
-        progress_printer.report_step(<span class="number">3</span>, <span class="string">&quot;Downloading and unpacking the snapshot…&quot;</span>)<span class="question-mark">?</span>;
-        client
-            .snapshot()
-            .download_unpack(<span class="kw-2">&amp;</span>snapshot_message, <span class="kw-2">&amp;</span>db_dir)
-            .<span class="kw">await
-            </span>.with_context(|| {
-                <span class="macro">format!</span>(
-                    <span class="string">&quot;Snapshot Service can not download and verify the snapshot for digest: &#39;{}&#39;&quot;</span>,
-                    <span class="self">self</span>.digest
-                )
-            })<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(certificate)
+    }
+
+    <span class="kw">async fn </span>download_and_unpack_snapshot(
+        step_number: u16,
+        progress_printer: <span class="kw-2">&amp;</span>ProgressPrinter,
+        client: <span class="kw-2">&amp;</span>Client,
+        snapshot: <span class="kw-2">&amp;</span>Snapshot,
+        db_dir: <span class="kw-2">&amp;</span>Path,
+    ) -&gt; StdResult&lt;()&gt; {
+        progress_printer.report_step(step_number, <span class="string">&quot;Downloading and unpacking the snapshot…&quot;</span>)<span class="question-mark">?</span>;
+        client.snapshot().download_unpack(snapshot, db_dir).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// The snapshot download does not fail if the statistic call fails.
         // It would be nice to implement tests to verify the behavior of `add_statistics`
-        </span><span class="kw">if let </span><span class="prelude-val">Err</span>(e) = SnapshotUtils::add_statistics(
-            <span class="kw-2">&amp;</span>params.require(<span class="string">&quot;aggregator_endpoint&quot;</span>)<span class="question-mark">?</span>,
-            <span class="kw-2">&amp;</span>snapshot_message,
-        )
-        .<span class="kw">await
-        </span>{
-            <span class="macro">warn!</span>(<span class="string">&quot;Could not POST snapshot download statistics: {e:?}&quot;</span>);
+        </span><span class="kw">if let </span><span class="prelude-val">Err</span>(e) = client.snapshot().add_statistics(snapshot).<span class="kw">await </span>{
+            <span class="macro">warn!</span>(<span class="string">&quot;Could not increment snapshot download statistics: {e:?}&quot;</span>);
         }
 
         <span class="comment">// Append &#39;clean&#39; file to speedup node bootstrap
@@ -401,29 +543,56 @@
             );
         };
 
-        progress_printer.report_step(<span class="number">4</span>, <span class="string">&quot;Computing the snapshot digest…&quot;</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">async fn </span>compute_snapshot_message(
+        step_number: u16,
+        progress_printer: <span class="kw-2">&amp;</span>ProgressPrinter,
+        certificate: <span class="kw-2">&amp;</span>MithrilCertificate,
+        db_dir: <span class="kw-2">&amp;</span>Path,
+    ) -&gt; StdResult&lt;ProtocolMessage&gt; {
+        progress_printer.report_step(step_number, <span class="string">&quot;Computing the snapshot message&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>message = SnapshotUtils::wait_spinner(
-            <span class="kw-2">&amp;</span>progress_printer,
-            MessageBuilder::new().compute_snapshot_message(<span class="kw-2">&amp;</span>certificate, <span class="kw-2">&amp;</span>db_dir),
+            progress_printer,
+            MessageBuilder::new().compute_snapshot_message(certificate, db_dir),
         )
         .<span class="kw">await
         </span>.with_context(|| {
             <span class="macro">format!</span>(
                 <span class="string">&quot;Can not compute the snapshot message from the directory: &#39;{:?}&#39;&quot;</span>,
-                <span class="kw-2">&amp;</span>db_dir
+                db_dir
             )
         })<span class="question-mark">?</span>;
 
-        progress_printer.report_step(<span class="number">5</span>, <span class="string">&quot;Verifying the snapshot signature…&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if </span>!certificate.match_message(<span class="kw-2">&amp;</span>message) {
+        <span class="prelude-val">Ok</span>(message)
+    }
+
+    <span class="kw">async fn </span>verify_snapshot_signature(
+        step_number: u16,
+        progress_printer: <span class="kw-2">&amp;</span>ProgressPrinter,
+        certificate: <span class="kw-2">&amp;</span>MithrilCertificate,
+        message: <span class="kw-2">&amp;</span>ProtocolMessage,
+        snapshot: <span class="kw-2">&amp;</span>Snapshot,
+    ) -&gt; StdResult&lt;()&gt; {
+        progress_printer.report_step(step_number, <span class="string">&quot;Verifying the snapshot signature…&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!certificate.match_message(message) {
             <span class="macro">debug!</span>(<span class="string">&quot;Digest verification failed, removing unpacked files &amp; directory.&quot;</span>);
 
             <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(
                 <span class="string">&quot;Certificate verification failed (snapshot digest = &#39;{}&#39;).&quot;</span>,
-                snapshot_message.digest.clone()
+                snapshot.digest.clone()
             ));
         }
 
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn </span>log_download_information(
+        db_dir: <span class="kw-2">&amp;</span>Path,
+        snapshot: <span class="kw-2">&amp;</span>Snapshot,
+        json_output: bool,
+    ) -&gt; StdResult&lt;()&gt; {
         <span class="kw">let </span>canonicalized_filepath = <span class="kw-2">&amp;</span>db_dir.canonicalize().with_context(|| {
             <span class="macro">format!</span>(
                 <span class="string">&quot;Could not get canonicalized filepath of &#39;{}&#39;&quot;</span>,
@@ -431,30 +600,33 @@
             )
         })<span class="question-mark">?</span>;
 
-        <span class="kw">if </span><span class="self">self</span>.json {
+        <span class="kw">if </span>json_output {
             <span class="macro">println!</span>(
                 <span class="string">r#&quot;{{&quot;timestamp&quot;: &quot;{}&quot;, &quot;db_directory&quot;: &quot;{}&quot;}}&quot;#</span>,
                 Utc::now().to_rfc3339(),
                 canonicalized_filepath.display()
             );
         } <span class="kw">else </span>{
+            <span class="kw">let </span>cardano_node_version = snapshot
+                .cardano_node_version
+                .clone()
+                .unwrap_or(<span class="string">&quot;latest&quot;</span>.to_string());
             <span class="macro">println!</span>(
                 <span class="string">r###&quot;Snapshot &#39;{}&#39; has been unpacked and successfully checked against Mithril multi-signature contained in the certificate.
-                
-Files in the directory &#39;{}&#39; can be used to run a Cardano node with version &gt;= {}.
-
-If you are using Cardano Docker image, you can restore a Cardano Node with:
-
-docker run -v cardano-node-ipc:/ipc -v cardano-node-data:/data --mount type=bind,source=&quot;{}&quot;,target=/data/db/ -e NETWORK={} inputoutput/cardano-node:8.1.2
-
-&quot;###</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.digest,
+                    
+    Files in the directory &#39;{}&#39; can be used to run a Cardano node with version &gt;= {}.
+    
+    If you are using Cardano Docker image, you can restore a Cardano Node with:
+    
+    docker run -v cardano-node-ipc:/ipc -v cardano-node-data:/data --mount type=bind,source=&quot;{}&quot;,target=/data/db/ -e NETWORK={} inputoutput/cardano-node:{}
+    
+    &quot;###</span>,
+                snapshot.digest,
                 db_dir.display(),
-                snapshot_message
-                    .cardano_node_version
-                    .unwrap_or(<span class="string">&quot;latest&quot;</span>.to_string()),
+                cardano_node_version,
                 canonicalized_filepath.display(),
-                snapshot_message.beacon.network,
+                snapshot.beacon.network,
+                cardano_node_version
             );
         }
 

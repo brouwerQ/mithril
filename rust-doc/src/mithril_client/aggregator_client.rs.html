@@ -282,6 +282,92 @@
 <a href="#282" id="282">282</a>
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
+<a href="#352" id="352">352</a>
+<a href="#353" id="353">353</a>
+<a href="#354" id="354">354</a>
+<a href="#355" id="355">355</a>
+<a href="#356" id="356">356</a>
+<a href="#357" id="357">357</a>
+<a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
+<a href="#360" id="360">360</a>
+<a href="#361" id="361">361</a>
+<a href="#362" id="362">362</a>
+<a href="#363" id="363">363</a>
+<a href="#364" id="364">364</a>
+<a href="#365" id="365">365</a>
+<a href="#366" id="366">366</a>
+<a href="#367" id="367">367</a>
+<a href="#368" id="368">368</a>
+<a href="#369" id="369">369</a>
+<a href="#370" id="370">370</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Mechanisms to exchange data with an Aggregator.
 //!
 //! The [AggregatorClient] trait abstracts how the communication with an Aggregator
@@ -352,6 +438,12 @@
     },
     <span class="doccomment">/// Lists the aggregator [snapshots][crate::Snapshot]
     </span>ListSnapshots,
+
+    <span class="doccomment">/// Increments the aggregator snapshot download statistics
+    </span>IncrementSnapshotStatistic {
+        <span class="doccomment">/// Snapshot as HTTP request body
+        </span>snapshot: String,
+    },
 }
 
 <span class="kw">impl </span>AggregatorRequest {
@@ -372,6 +464,19 @@
                 <span class="macro">format!</span>(<span class="string">&quot;artifact/snapshot/{}&quot;</span>, digest)
             }
             AggregatorRequest::ListSnapshots =&gt; <span class="string">&quot;artifact/snapshots&quot;</span>.to_string(),
+            AggregatorRequest::IncrementSnapshotStatistic { snapshot: <span class="kw">_ </span>} =&gt; {
+                <span class="string">&quot;statistics/snapshot&quot;</span>.to_string()
+            }
+        }
+    }
+
+    <span class="doccomment">/// Get the request body to send to the aggregator
+    </span><span class="kw">pub fn </span>get_body(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            AggregatorRequest::IncrementSnapshotStatistic { snapshot } =&gt; {
+                <span class="prelude-val">Some</span>(snapshot.to_string())
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
@@ -382,6 +487,12 @@
 </span><span class="kw">pub trait </span>AggregatorClient: Sync + Send {
     <span class="doccomment">/// Get the content back from the Aggregator
     </span><span class="kw">async fn </span>get_content(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        request: AggregatorRequest,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, AggregatorClientError&gt;;
+
+    <span class="doccomment">/// Post information to the Aggregator
+    </span><span class="kw">async fn </span>post_content(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         request: AggregatorRequest,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;String, AggregatorClientError&gt;;
@@ -492,6 +603,49 @@
         }
     }
 
+    <span class="attr">#[cfg_attr(target_family = <span class="string">&quot;wasm&quot;</span>, async_recursion(<span class="question-mark">?</span>Send))]
+    #[cfg_attr(not(target_family = <span class="string">&quot;wasm&quot;</span>), async_recursion)]
+    </span><span class="kw">async fn </span>post(<span class="kw-2">&amp;</span><span class="self">self</span>, url: Url, json: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Response, AggregatorClientError&gt; {
+        <span class="macro">debug!</span>(<span class="self">self</span>.logger, <span class="string">&quot;POST url=&#39;{url}&#39; json=&#39;{json}&#39;.&quot;</span>);
+        <span class="kw">let </span>request_builder = <span class="self">self</span>.http_client.post(url.to_owned()).body(json.to_owned());
+        <span class="kw">let </span>current_api_version = <span class="self">self
+            </span>.compute_current_api_version()
+            .<span class="kw">await
+            </span>.unwrap()
+            .to_string();
+        <span class="macro">debug!</span>(
+            <span class="self">self</span>.logger,
+            <span class="string">&quot;Prepare request with version: {current_api_version}&quot;
+        </span>);
+        <span class="kw">let </span>request_builder =
+            request_builder.header(MITHRIL_API_VERSION_HEADER, current_api_version);
+
+        <span class="kw">let </span>response = request_builder.send().<span class="kw">await</span>.map_err(|e| {
+            AggregatorClientError::SubsystemError(
+                <span class="macro">anyhow!</span>(e).context(<span class="string">&quot;Error while POSTing data &#39;{json}&#39; to URL=&#39;{url}&#39;.&quot;</span>),
+            )
+        })<span class="question-mark">?</span>;
+
+        <span class="kw">match </span>response.status() {
+            StatusCode::OK | StatusCode::CREATED =&gt; <span class="prelude-val">Ok</span>(response),
+            StatusCode::PRECONDITION_FAILED =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.discard_current_api_version().<span class="kw">await</span>.is_some()
+                    &amp;&amp; !<span class="self">self</span>.api_versions.read().<span class="kw">await</span>.is_empty()
+                {
+                    <span class="kw">return </span><span class="self">self</span>.post(url, json).<span class="kw">await</span>;
+                }
+
+                <span class="prelude-val">Err</span>(<span class="self">self</span>.handle_api_error(<span class="kw-2">&amp;</span>response).<span class="kw">await</span>)
+            }
+            StatusCode::NOT_FOUND =&gt; <span class="prelude-val">Err</span>(AggregatorClientError::RemoteServerLogical(<span class="macro">anyhow!</span>(
+                <span class="string">&quot;Url=&#39;{url} not found&quot;
+            </span>))),
+            status_code =&gt; <span class="prelude-val">Err</span>(AggregatorClientError::RemoteServerTechnical(<span class="macro">anyhow!</span>(
+                <span class="string">&quot;Unhandled error {status_code}&quot;
+            </span>))),
+        }
+    }
+
     <span class="doccomment">/// API version error handling
     </span><span class="kw">async fn </span>handle_api_error(<span class="kw-2">&amp;</span><span class="self">self</span>, response: <span class="kw-2">&amp;</span>Response) -&gt; AggregatorClientError {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(version) = response.headers().get(MITHRIL_API_VERSION_HEADER) {
@@ -536,6 +690,24 @@
             AggregatorClientError::SubsystemError(<span class="macro">anyhow!</span>(e).context(<span class="macro">format!</span>(
                 <span class="string">&quot;Could not find a JSON body in the response &#39;{content}&#39;.&quot;
             </span>)))
+        })
+    }
+
+    <span class="kw">async fn </span>post_content(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        request: AggregatorRequest,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;String, AggregatorClientError&gt; {
+        <span class="kw">let </span>response = <span class="self">self
+            </span>.post(
+                <span class="self">self</span>.get_url_for_route(<span class="kw-2">&amp;</span>request.route())<span class="question-mark">?</span>,
+                <span class="kw-2">&amp;</span>request.get_body().unwrap_or_default(),
+            )
+            .<span class="kw">await</span><span class="question-mark">?</span>;
+
+        response.text().<span class="kw">await</span>.map_err(|e| {
+            AggregatorClientError::SubsystemError(
+                <span class="macro">anyhow!</span>(e).context(<span class="string">&quot;Could not find a text body in the response.&quot;</span>),
+            )
         })
     }
 }

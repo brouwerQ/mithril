@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["common","configuration","http_client","utils"]};
+window.SIDEBAR_ITEMS = {"mod":["configuration","utils"]};
