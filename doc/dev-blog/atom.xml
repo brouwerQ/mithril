@@ -2,11 +2,48 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://mithril.network/doc/dev-blog</id>
     <title>Mithril. A complete guide. Blog</title>
-    <updated>2023-11-27T00:00:00.000Z</updated>
+    <updated>2024-01-03T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://mithril.network/doc/dev-blog"/>
     <subtitle>Mithril. A complete guide. Blog</subtitle>
     <icon>https://mithril.network/doc/img/logo.svg</icon>
+    <entry>
+        <title type="html"><![CDATA[Mithril signer node service recommended configuration is updated]]></title>
+        <id>https://mithril.network/doc/dev-blog/2024/01/03/signer-service-recommended-configuration-updated</id>
+        <link href="https://mithril.network/doc/dev-blog/2024/01/03/signer-service-recommended-configuration-updated"/>
+        <updated>2024-01-03T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[The Mithril signer node service recommended configuration is updated]]></summary>
+        <content type="html"><![CDATA[<h3 id="the-mithril-signer-node-service-recommended-configuration-is-updated">The Mithril signer node service recommended configuration is updated</h3>
+<p><strong>PR</strong>: <code>Fix signer service recommended configuration</code> <a href="https://github.com/input-output-hk/mithril/pull/1419">#1419</a></p>
+<p><strong>Issue</strong>: <code>Fix signer node service setup</code> <a href="https://github.com/input-output-hk/mithril/issues/1404">#1404</a></p>
+<p>The previous recommended configuration proposed a service restart frequency which was too high. When the service was restarted, and if the Cardano node was not ready yet, the service tried to restart too many times in a short period: thus the service just failed and the service had to be started manually after the Cardano node is up and ready. This lead to some SPOs skipping registrations for some epochs.</p>
+<p>The duration before restarting the service is increased to 60s: <code>RestartSec=60</code>.</p>
+<p>Below is the new recommended configuration:</p>
+<pre><code>[Unit]
+Description=Mithril signer service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User=cardano
+EnvironmentFile=/opt/mithril/mithril-signer.env
+ExecStart=/opt/mithril/mithril-signer -vvv
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+</code></pre>
+<p>We highly recommend to update your existing configuration file (<code>/etc/systemd/system/mithril-signer.service</code>) with the values specified in the <a href="https://mithril.network/doc/next/manual/getting-started/run-signer-node/#installing-the-service">guide</a></p>
+<p>Feel free to reach out to us on the <a href="https://discord.gg/5kaErDKDRq">Discord channel</a> for questions and/or help.</p>]]></content>
+        <author>
+            <name>Mithril Team</name>
+        </author>
+        <category label="spo" term="spo"/>
+        <category label="mithril signer" term="mithril signer"/>
+        <category label="production" term="production"/>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mithril client library is released!]]></title>
         <id>https://mithril.network/doc/dev-blog/2023/11/27/mithril-client-library-released</id>
