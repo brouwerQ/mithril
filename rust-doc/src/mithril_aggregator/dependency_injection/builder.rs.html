@@ -1268,6 +1268,12 @@
 <a href="#1268" id="1268">1268</a>
 <a href="#1269" id="1269">1269</a>
 <a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::Context;
@@ -1287,9 +1293,7 @@
 <span class="kw">use </span>mithril_common::{
     api_version::APIVersionProvider,
     certificate_chain::{CertificateVerifier, MithrilCertificateVerifier},
-    chain_observer::{
-        CardanoCliChainObserver, CardanoCliRunner, ChainObserver, FakeObserver, PallasChainObserver,
-    },
+    chain_observer::{CardanoCliRunner, ChainObserver, ChainObserverBuilder, FakeObserver},
     crypto_helper::{
         ProtocolGenesisSigner, ProtocolGenesisVerificationKey, ProtocolGenesisVerifier,
     },
@@ -1757,16 +1761,24 @@
     <span class="kw">async fn </span>build_chain_observer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>ChainObserver&gt;&gt; {
         <span class="kw">let </span>chain_observer: Arc&lt;<span class="kw">dyn </span>ChainObserver&gt; = <span class="kw">match </span><span class="self">self</span>.configuration.environment {
             ExecutionEnvironment::Production =&gt; {
-                <span class="kw">let </span>fallback = CardanoCliChainObserver::new(<span class="self">self</span>.get_cardano_cli_runner().<span class="kw">await</span><span class="question-mark">?</span>);
-                <span class="kw">let </span>observer = PallasChainObserver::new(
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.configuration.cardano_node_socket_path,
-                    <span class="self">self</span>.configuration.get_network().with_context(|| {
-                        <span class="string">&quot;Dependencies Builder can not get Cardano network while building cardano cli runner&quot;
-                    </span>})<span class="question-mark">?</span>,
-                    fallback,
+                <span class="kw">let </span>cardano_cli_runner = <span class="kw-2">&amp;</span><span class="self">self</span>.get_cardano_cli_runner().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>chain_observer_type = <span class="kw-2">&amp;</span><span class="self">self</span>.configuration.chain_observer_type;
+                <span class="kw">let </span>cardano_node_socket_path = <span class="kw-2">&amp;</span><span class="self">self</span>.configuration.cardano_node_socket_path;
+                <span class="kw">let </span>cardano_network = <span class="kw-2">&amp;</span><span class="self">self
+                    </span>.configuration
+                    .get_network()
+                    .with_context(|| <span class="string">&quot;Dependencies Builder can not get Cardano network while building the chain observer&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>chain_observer_builder = ChainObserverBuilder::new(
+                    chain_observer_type,
+                    cardano_node_socket_path,
+                    cardano_network,
+                    <span class="prelude-val">Some</span>(cardano_cli_runner),
                 );
-                Arc::new(observer)
-            }
+
+                chain_observer_builder
+                    .build()
+                    .with_context(|| <span class="string">&quot;Dependencies Builder can not build chain observer&quot;</span>)<span class="question-mark">?
+            </span>}
             <span class="kw">_ </span>=&gt; Arc::new(FakeObserver::default()),
         };
 
