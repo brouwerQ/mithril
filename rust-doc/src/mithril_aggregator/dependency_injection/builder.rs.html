@@ -1274,6 +1274,14 @@
 <a href="#1274" id="1274">1274</a>
 <a href="#1275" id="1275">1275</a>
 <a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::Context;
@@ -1311,7 +1319,9 @@
     signable_builder::{
         CardanoImmutableFilesFullSignableBuilder, MithrilStakeDistributionSignableBuilder,
     },
-    signable_builder::{MithrilSignableBuilderService, SignableBuilderService},
+    signable_builder::{
+        CardanoTransactionsSignableBuilder, MithrilSignableBuilderService, SignableBuilderService,
+    },
     sqlite::SqliteConnection,
     store::adapter::{MemoryAdapter, SQLiteAdapter, StoreAdapter},
     BeaconProvider, BeaconProviderImpl,
@@ -1319,7 +1329,8 @@
 
 <span class="kw">use crate</span>::{
     artifact_builder::{
-        CardanoImmutableFilesFullArtifactBuilder, MithrilStakeDistributionArtifactBuilder,
+        CardanoImmutableFilesFullArtifactBuilder, CardanoTransactionsArtifactBuilder,
+        MithrilStakeDistributionArtifactBuilder,
     },
     configuration::ExecutionEnvironment,
     database::provider::{
@@ -2214,9 +2225,11 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.configuration.db_directory,
             <span class="self">self</span>.get_logger().<span class="kw">await</span><span class="question-mark">?</span>,
         ));
+        <span class="kw">let </span>cardano_transactions_builder = Arc::new(CardanoTransactionsSignableBuilder::default());
         <span class="kw">let </span>signable_builder_service = Arc::new(MithrilSignableBuilderService::new(
             mithril_stake_distribution_builder,
             immutable_signable_builder,
+            cardano_transactions_builder,
         ));
 
         <span class="prelude-val">Ok</span>(signable_builder_service)
@@ -2249,10 +2262,13 @@
                 snapshot_uploader,
                 <span class="self">self</span>.configuration.snapshot_compression_algorithm,
             ));
+        <span class="kw">let </span>cardano_transactions_artifact_builder =
+            Arc::new(CardanoTransactionsArtifactBuilder::new());
         <span class="kw">let </span>signed_entity_service = Arc::new(MithrilSignedEntityService::new(
             signed_entity_storer,
             mithril_stake_distribution_artifact_builder,
             cardano_immutable_files_full_artifact_builder,
+            cardano_transactions_artifact_builder,
         ));
 
         <span class="prelude-val">Ok</span>(signed_entity_service)

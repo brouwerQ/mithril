@@ -885,6 +885,8 @@
 <a href="#885" id="885">885</a>
 <a href="#886" id="886">886</a>
 <a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::Context;
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>slog_scope::{debug, info, trace, warn};
@@ -1347,8 +1349,8 @@
             EraChecker, EraReader,
         },
         signable_builder::{
-            CardanoImmutableFilesFullSignableBuilder, MithrilSignableBuilderService,
-            MithrilStakeDistributionSignableBuilder,
+            CardanoImmutableFilesFullSignableBuilder, CardanoTransactionsSignableBuilder,
+            MithrilSignableBuilderService, MithrilStakeDistributionSignableBuilder,
         },
         store::{
             adapter::{DumbStoreAdapter, MemoryAdapter},
@@ -1413,9 +1415,11 @@
             ));
         <span class="kw">let </span>mithril_stake_distribution_signable_builder =
             Arc::new(MithrilStakeDistributionSignableBuilder::default());
+        <span class="kw">let </span>cardano_transactions_builder = Arc::new(CardanoTransactionsSignableBuilder::default());
         <span class="kw">let </span>signable_builder_service = Arc::new(MithrilSignableBuilderService::new(
             mithril_stake_distribution_signable_builder,
             cardano_immutable_signable_builder,
+            cardano_transactions_builder,
         ));
 
         SignerServices {

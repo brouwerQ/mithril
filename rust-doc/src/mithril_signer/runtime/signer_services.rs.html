@@ -384,6 +384,9 @@
 <a href="#384" id="384">384</a>
 <a href="#385" id="385">385</a>
 <a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::{anyhow, Context};
 <span class="kw">use </span>async_trait::async_trait;
 <span class="kw">use </span>sqlite::Connection;
@@ -401,8 +404,9 @@
     digesters::{CardanoImmutableDigester, ImmutableDigester, ImmutableFileSystemObserver},
     era::{EraChecker, EraReader},
     signable_builder::{
-        CardanoImmutableFilesFullSignableBuilder, MithrilSignableBuilderService,
-        MithrilStakeDistributionSignableBuilder, SignableBuilderService,
+        CardanoImmutableFilesFullSignableBuilder, CardanoTransactionsSignableBuilder,
+        MithrilSignableBuilderService, MithrilStakeDistributionSignableBuilder,
+        SignableBuilderService,
     },
     sqlite::SqliteConnection,
     store::{adapter::SQLiteAdapter, StakeStore},
@@ -635,9 +639,11 @@
             ));
         <span class="kw">let </span>mithril_stake_distribution_signable_builder =
             Arc::new(MithrilStakeDistributionSignableBuilder::default());
+        <span class="kw">let </span>cardano_transactions_builder = Arc::new(CardanoTransactionsSignableBuilder::default());
         <span class="kw">let </span>signable_builder_service = Arc::new(MithrilSignableBuilderService::new(
             mithril_stake_distribution_signable_builder,
             cardano_immutable_snapshot_builder,
+            cardano_transactions_builder,
         ));
 
         <span class="kw">let </span>services = SignerServices {
