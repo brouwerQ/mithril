@@ -150,7 +150,7 @@
                 signed_entity_id: <span class="string">&quot;snapshot-id-123&quot;</span>.to_string(),
                 signed_entity_type: SignedEntityType::CardanoTransactions(Beacon::default()),
                 certificate_id: <span class="string">&quot;certificate-hash-123&quot;</span>.to_string(),
-                artifact: CardanoTransactionsCommitment::new(<span class="string">&quot;mkroot123&quot;</span>.to_string()),
+                artifact: CardanoTransactionsCommitment::new(<span class="string">&quot;mkroot123&quot;</span>.to_string(), Beacon::default()),
                 created_at: DateTime::parse_from_rfc3339(<span class="string">&quot;2023-01-19T13:43:05.618857482Z&quot;</span>)
                     .unwrap()
                     .with_timezone(<span class="kw-2">&amp;</span>Utc),
