@@ -78,11 +78,11 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
-</pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(any(test, feature = <span class="string">&quot;test_tools&quot;</span>))]
 </span><span class="kw">use super</span>::{Beacon, Epoch};
 <span class="kw">use super</span>::{CardanoTransactionsCommitment, MithrilStakeDistribution, SignedEntityType, Snapshot};
 <span class="kw">use </span><span class="kw">crate</span>::signable_builder::Artifact;
-<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+<span class="attr">#[cfg(any(test, feature = <span class="string">&quot;test_tools&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::test_utils::fake_data;
 <span class="kw">use </span>chrono::{DateTime, Utc};
 

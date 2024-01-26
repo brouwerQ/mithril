@@ -36,11 +36,11 @@
 <span class="kw">mod </span>era;
 <span class="kw">mod </span>genesis;
 <span class="kw">mod </span>merkle_tree;
-<span class="attr">#[cfg(feature = <span class="string">&quot;test_tools&quot;</span>)]
+<span class="attr">#[cfg(any(test, feature = <span class="string">&quot;test_tools&quot;</span>))]
 </span><span class="kw">pub mod </span>tests_setup;
 <span class="kw">mod </span>types;
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;random&quot;</span>)]
+<span class="attr">#[cfg(any(test, feature = <span class="string">&quot;random&quot;</span>))]
 </span><span class="kw">pub use </span>cardano::ColdKeyGenerator;
 
 <span class="kw">pub use </span>cardano::{
