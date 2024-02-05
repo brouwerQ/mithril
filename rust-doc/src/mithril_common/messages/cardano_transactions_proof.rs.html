@@ -23,14 +23,24 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::entities::{CardanoTransactionsSetProof, TransactionHash};
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::entities::TransactionHash;
+<span class="kw">use </span><span class="kw">crate</span>::messages::CardanoTransactionsSetProofMessagePart;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="doccomment">/// A cryptographic proof for a set of Cardano transactions
 </span><span class="attr">#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 </span><span class="kw">pub struct </span>CardanoTransactionsProofsMessage {
+    <span class="doccomment">/// Hash of the certificate that validate this proof merkle root
+    </span>certificate_hash: String,
+
     <span class="doccomment">/// Transactions that have been certified
-    </span>certified_transactions: Vec&lt;CardanoTransactionsSetProof&gt;,
+    </span>certified_transactions: Vec&lt;CardanoTransactionsSetProofMessagePart&gt;,
 
     <span class="doccomment">/// Transactions that could not be certified
     </span>non_certified_transactions: Vec&lt;TransactionHash&gt;,
@@ -39,10 +49,12 @@
 <span class="kw">impl </span>CardanoTransactionsProofsMessage {
     <span class="doccomment">/// Create a new `CardanoTransactionsProofsMessage`
     </span><span class="kw">pub fn </span>new(
-        certified_transactions: Vec&lt;CardanoTransactionsSetProof&gt;,
+        certificate_hash: <span class="kw-2">&amp;</span>str,
+        certified_transactions: Vec&lt;CardanoTransactionsSetProofMessagePart&gt;,
         non_certified_transactions: Vec&lt;TransactionHash&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            certificate_hash: certificate_hash.to_string(),
             certified_transactions,
             non_certified_transactions,
         }

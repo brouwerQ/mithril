@@ -182,6 +182,14 @@
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
 <a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>anyhow::Context;
@@ -189,7 +197,7 @@
 
 <span class="kw">use </span>mithril_common::{
     crypto_helper::{MKTree, MKTreeNode, MKTreeStore},
-    entities::{CardanoTransaction, CardanoTransactionsSetProof, TransactionHash},
+    entities::{Beacon, CardanoTransaction, CardanoTransactionsSetProof, TransactionHash},
     StdResult,
 };
 
@@ -203,6 +211,7 @@
     <span class="doccomment">/// Compute the cryptographic proofs for the given transactions
     </span><span class="kw">async fn </span>compute_transactions_proofs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
+        up_to: <span class="kw-2">&amp;</span>Beacon,
         transaction_hashes: <span class="kw-2">&amp;</span>[TransactionHash],
     ) -&gt; StdResult&lt;Vec&lt;CardanoTransactionsSetProof&gt;&gt;;
 }
@@ -211,8 +220,8 @@
 </span><span class="attr">#[cfg_attr(test, automock)]
 #[async_trait]
 </span><span class="kw">pub trait </span>TransactionsRetriever: Sync + Send {
-    <span class="doccomment">/// Get all transactions
-    </span><span class="kw">async fn </span>get_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StdResult&lt;Vec&lt;CardanoTransaction&gt;&gt;;
+    <span class="doccomment">/// Get transactions up to given beacon
+    </span><span class="kw">async fn </span>get_up_to(<span class="kw-2">&amp;</span><span class="self">self</span>, beacon: <span class="kw-2">&amp;</span>Beacon) -&gt; StdResult&lt;Vec&lt;CardanoTransaction&gt;&gt;;
 }
 
 <span class="doccomment">/// Mithril prover
@@ -233,9 +242,10 @@
 </span><span class="kw">impl </span>ProverService <span class="kw">for </span>MithrilProverService {
     <span class="kw">async fn </span>compute_transactions_proofs(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
+        up_to: <span class="kw-2">&amp;</span>Beacon,
         transaction_hashes: <span class="kw-2">&amp;</span>[TransactionHash],
     ) -&gt; StdResult&lt;Vec&lt;CardanoTransactionsSetProof&gt;&gt; {
-        <span class="kw">let </span>transactions = <span class="self">self</span>.transaction_retriever.get_all().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>transactions = <span class="self">self</span>.transaction_retriever.get_up_to(up_to).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let </span>mk_leaves_all: Vec&lt;MKTreeNode&gt; =
             transactions.iter().map(|t| t.to_owned().into()).collect();
         <span class="kw">let </span>store = MKTreeStore::default();
@@ -270,6 +280,8 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>anyhow::anyhow;
     <span class="kw">use </span>mithril_common::entities::CardanoTransaction;
+    <span class="kw">use </span>mithril_common::test_utils::fake_data;
+    <span class="kw">use </span>mockall::predicate::eq;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
@@ -293,11 +305,12 @@
         <span class="kw">let </span>(transaction_hashes, transactions) = generate_transactions(<span class="number">3</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_retriever = MockTransactionsRetriever::new();
         transaction_retriever
-            .expect_get_all()
-            .return_once(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(transactions));
+            .expect_get_up_to()
+            .with(eq(fake_data::beacon()))
+            .return_once(<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(transactions));
         <span class="kw">let </span>prover = MithrilProverService::new(Arc::new(transaction_retriever));
         <span class="kw">let </span>transactions_set_proof = prover
-            .compute_transactions_proofs(<span class="kw-2">&amp;</span>transaction_hashes)
+            .compute_transactions_proofs(<span class="kw-2">&amp;</span>fake_data::beacon(), <span class="kw-2">&amp;</span>transaction_hashes)
             .<span class="kw">await
             </span>.unwrap();
 
@@ -314,11 +327,12 @@
         <span class="kw">let </span>(transaction_hashes, _transactions) = generate_transactions(<span class="number">3</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_retriever = MockTransactionsRetriever::new();
         transaction_retriever
-            .expect_get_all()
-            .returning(|| <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]));
+            .expect_get_up_to()
+            .with(eq(fake_data::beacon()))
+            .returning(|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]));
         <span class="kw">let </span>prover = MithrilProverService::new(Arc::new(transaction_retriever));
         <span class="kw">let </span>transactions_set_proof = prover
-            .compute_transactions_proofs(<span class="kw-2">&amp;</span>transaction_hashes)
+            .compute_transactions_proofs(<span class="kw-2">&amp;</span>fake_data::beacon(), <span class="kw-2">&amp;</span>transaction_hashes)
             .<span class="kw">await
             </span>.unwrap();
 
@@ -326,17 +340,18 @@
     }
 
     <span class="attr">#[tokio::test]
-    </span><span class="kw">async fn </span>compute_proof_for_one_set_of_three_known_transactions_and_two_unkwnows() {
+    </span><span class="kw">async fn </span>compute_proof_for_one_set_of_three_known_transactions_and_two_unknowns() {
         <span class="kw">let </span>(transaction_hashes, transactions) = generate_transactions(<span class="number">5</span>);
         <span class="comment">// The last two are not in the &quot;store&quot;
         </span><span class="kw">let </span>transactions = transactions[<span class="number">0</span>..=<span class="number">2</span>].to_vec();
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_retriever = MockTransactionsRetriever::new();
         transaction_retriever
-            .expect_get_all()
-            .return_once(<span class="kw">move </span>|| <span class="prelude-val">Ok</span>(transactions));
+            .expect_get_up_to()
+            .with(eq(fake_data::beacon()))
+            .return_once(<span class="kw">move </span>|<span class="kw">_</span>| <span class="prelude-val">Ok</span>(transactions));
         <span class="kw">let </span>prover = MithrilProverService::new(Arc::new(transaction_retriever));
         <span class="kw">let </span>transactions_set_proof = prover
-            .compute_transactions_proofs(<span class="kw-2">&amp;</span>transaction_hashes)
+            .compute_transactions_proofs(<span class="kw-2">&amp;</span>fake_data::beacon(), <span class="kw-2">&amp;</span>transaction_hashes)
             .<span class="kw">await
             </span>.unwrap();
 
@@ -356,12 +371,13 @@
         <span class="kw">let </span>(transaction_hashes, _transactions) = generate_transactions(<span class="number">3</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>transaction_retriever = MockTransactionsRetriever::new();
         transaction_retriever
-            .expect_get_all()
-            .returning(|| <span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;Error&quot;</span>)));
+            .expect_get_up_to()
+            .with(eq(fake_data::beacon()))
+            .returning(|<span class="kw">_</span>| <span class="prelude-val">Err</span>(<span class="macro">anyhow!</span>(<span class="string">&quot;Error&quot;</span>)));
 
         <span class="kw">let </span>prover = MithrilProverService::new(Arc::new(transaction_retriever));
         prover
-            .compute_transactions_proofs(<span class="kw-2">&amp;</span>transaction_hashes)
+            .compute_transactions_proofs(<span class="kw-2">&amp;</span>fake_data::beacon(), <span class="kw-2">&amp;</span>transaction_hashes)
             .<span class="kw">await
             </span>.expect_err(<span class="string">&quot;Should have failed because of its retriever&quot;</span>);
     }
