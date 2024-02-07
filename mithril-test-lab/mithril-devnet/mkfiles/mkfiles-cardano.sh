@@ -94,7 +94,10 @@ $SED -i "${ARTIFACTS_DIR_TEMP}/configuration.yaml" \
      -e '/ByronGenesisFile/ aConwayGenesisFile: shelley/genesis.conway.json' \
      -e 's/RequiresNoMagic/RequiresMagic/' \
      -e 's/LastKnownBlockVersion-Major: 0/LastKnownBlockVersion-Major: 6/' \
-     -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/'
+     -e 's/LastKnownBlockVersion-Minor: 2/LastKnownBlockVersion-Minor: 0/' \
+     -e 's/MaxConcurrencyDeadline: 2/MaxConcurrencyDeadline: 100/'
+# TODO: the value of MaxConcurrencyDeadline should not be that high. It seems that the PallasChainObserver is not closing connections properly, whcihc leads to errors:
+# ErrorPolicyUnhandledApplicationException (MuxError MuxBearerClosed "<socket: 47> closed when reading data, waiting on next header True")
 
 echo "TestShelleyHardForkAtEpoch: 0" >> "${ARTIFACTS_DIR_TEMP}/configuration.yaml"
 echo "TestAllegraHardForkAtEpoch: 0" >> "${ARTIFACTS_DIR_TEMP}/configuration.yaml"
