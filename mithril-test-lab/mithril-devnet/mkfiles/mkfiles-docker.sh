@@ -297,10 +297,10 @@ networks:
     driver: bridge
   cardano_network:
     driver: bridge
-    ipam:
-        driver: default
-        config:
-            - subnet: ${NODE_ADDR_PREFIX}.0/24
-              gateway: ${NODE_ADDR_PREFIX}.1
+    #ipam:
+    #    driver: default
+    #    config:
+    #        - subnet: ${NODE_ADDR_PREFIX}.0/24
+    #          gateway: ${NODE_ADDR_PREFIX}.1
     
 EOF
