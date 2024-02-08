@@ -293,10 +293,10 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Tools to helps validate conformity to an OpenAPI specification
 
 </span><span class="kw">use </span>glob::glob;
-<span class="kw">use </span>http::response::Response;
 <span class="kw">use </span>jsonschema::JSONSchema;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>serde_json::{json, Value, Value::Null};
+<span class="kw">use </span>warp::http::Response;
 <span class="kw">use </span>warp::hyper::body::Bytes;
 
 <span class="kw">use </span><span class="kw">crate</span>::era::SupportedEra;
@@ -482,8 +482,8 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>http::StatusCode;
     <span class="kw">use </span>warp::http::Method;
+    <span class="kw">use </span>warp::http::StatusCode;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::entities;
