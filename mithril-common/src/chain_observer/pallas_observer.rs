@@ -216,7 +216,7 @@ impl PallasChainObserver {
 #[async_trait]
 impl ChainObserver for PallasChainObserver {
     async fn get_current_epoch(&self) -> Result<Option<Epoch>, ChainObserverError> {
-        let mut client = self.get_client().await?;
+        /* let mut client = self.get_client().await?;
 
         let epoch = self.get_epoch(client.statequery()).await?;
 
@@ -224,14 +224,16 @@ impl ChainObserver for PallasChainObserver {
 
         client.abort().await;
 
-        Ok(Some(Epoch(epoch as u64)))
+        Ok(Some(Epoch(epoch as u64))) */
+        let fallback = self.get_fallback();
+        fallback.get_current_epoch().await
     }
 
     async fn get_current_datums(
         &self,
         address: &ChainAddress,
     ) -> Result<Datums, ChainObserverError> {
-        let mut client = self.get_client().await?;
+        /* let mut client = self.get_client().await?;
 
         let datums = self.get_utxo_datums(&mut client, address).await?;
 
@@ -239,7 +241,9 @@ impl ChainObserver for PallasChainObserver {
 
         client.abort().await;
 
-        Ok(datums)
+        Ok(datums) */
+        let fallback = self.get_fallback();
+        fallback.get_current_datums(address).await
     }
 
     async fn get_current_stake_distribution(
