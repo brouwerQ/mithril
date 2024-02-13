@@ -1244,8 +1244,8 @@
     Beacon, Certificate, CertificatePending, Epoch, ProtocolMessage, ProtocolMessagePartKey,
     SignedEntityType, SignedEntityTypeDiscriminants, Signer,
 };
-<span class="kw">use </span>mithril_common::store::StakeStorer;
 <span class="kw">use </span>mithril_common::{CardanoNetwork, StdResult};
+<span class="kw">use </span>mithril_persistence::store::StakeStorer;
 
 <span class="kw">use </span><span class="kw">crate</span>::entities::OpenMessage;
 <span class="kw">use </span><span class="kw">crate</span>::DependencyContainer;
@@ -1770,10 +1770,10 @@
             StakeDistribution,
         },
         signable_builder::SignableBuilderService,
-        store::StakeStorer,
         test_utils::{fake_data, MithrilFixtureBuilder},
         BeaconProviderImpl, CardanoNetwork, StdResult,
     };
+    <span class="kw">use </span>mithril_persistence::store::StakeStorer;
     <span class="kw">use </span>mockall::{mock, predicate::eq};
     <span class="kw">use </span>std::sync::Arc;
     <span class="kw">use </span>tokio::sync::RwLock;
