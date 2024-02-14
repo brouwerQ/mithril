@@ -273,6 +273,7 @@
 <a href="#272" id="272">272</a>
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>anyhow::anyhow;
 <span class="kw">use </span>serde::Serialize;
 <span class="kw">use </span>serde_json::Value;
@@ -282,11 +283,12 @@
 
 <span class="kw">use crate</span>::{StdError, StdResult};
 
-<span class="macro">cfg_fs! </span>{
+<span class="macro">cfg_fs_random! </span>{
     <span class="kw">use </span>serde::Deserialize;
     <span class="kw">use </span>anyhow::Context;
     <span class="kw">use </span>minicbor::{Decode, Decoder, decode};
     <span class="kw">use </span>pallas_primitives::{alonzo::PlutusData, ToCanonicalJson};
+
     <span class="doccomment">/// [Datum] represents an inline datum from UTxO.
     </span><span class="attr">#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
     #[serde(rename_all = <span class="string">"lowercase"</span>)]
